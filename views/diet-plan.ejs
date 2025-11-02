@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .result pre {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .info-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/index" class="back-button">← Back</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🥗 Diet Plan Generator</h1>
+            <p>Create personalized meal plans for your health goals</p>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>Your Goal:</label>
+                <select id="dietGoal">
+                    <option value="Weight Loss">Weight Loss</option>
+                    <option value="Weight Gain">Weight Gain</option>
+                    <option value="Muscle Building">Muscle Building</option>
+                    <option value="General Health">General Health & Wellness</option>
+                    <option value="Heart Health">Heart Health</option>
+                    <option value="Diabetes Management">Diabetes Management</option>
+                    <option value="High Protein">High Protein Diet</option>
+                    <option value="Low Carb">Low Carb Diet</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Dietary Restrictions (Optional):</label>
+                <input type="text" id="dietRestrictions" placeholder="e.g., vegetarian, vegan, gluten-free, dairy-free">
+            </div>
+
+            <div class="input-group">
+                <label>Food Preferences (Optional):</label>
+                <input type="text" id="preferences" placeholder="e.g., Indian cuisine, Mediterranean, No spicy food">
+            </div>
+
+            <div class="info-box">
+                📋 We'll create a complete one-day meal plan with breakfast, lunch, dinner, and snacks including calorie estimates
+            </div>
+
+            <button onclick="getDietPlan()" id="dietBtn">Generate Diet Plan</button>
+            
+            <div class="loading" id="loading">Creating your personalized diet plan...</div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function getDietPlan() {
+            const goal = document.getElementById('dietGoal').value;
+            const restrictions = document.getElementById('dietRestrictions').value;
+            const preferences = document.getElementById('preferences').value || 'Indian cuisine';
+
+            const btn = document.getElementById('dietBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch('/api/diet-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        goal,
+                        restrictions,
+                        preferences
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `<h3>Your ${escapeHtml(goal)} Diet Plan:</h3><pre>${escapeHtml(data.plan)}</pre>`;
+                } else {
+                    result.innerHTML = `<p style="color: red;">Error: ${escapeHtml(data.error)}</p>`;
+                }
+
+                result.classList.add('show');
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Connection error. Please try again.</p>`;
+                result.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+</script>

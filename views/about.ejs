@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile - Health Mario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e8dcff, #f6f5ff);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: auto;
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 6px 25px rgba(106, 13, 173, 0.15);
+      padding: 35px;
+      transition: 0.3s;
+      animation: fadeIn 0.7s ease;
+    }
+
+    .container:hover {
+      box-shadow: 0 10px 30px rgba(106, 13, 173, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #6a0dad;
+      margin-bottom: 35px;
+      font-size: 2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      border: 1px solid #e7e0ff;
+      border-radius: 15px;
+      padding: 25px;
+      background-color: #faf8ff;
+      transition: all 0.3s;
+    }
+
+    .section:hover {
+      background-color: #f3edff;
+    }
+
+    .section h2 {
+      color: #6a0dad;
+      margin-bottom: 18px;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 5px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #6a0dad;
+      box-shadow: 0 0 8px rgba(106, 13, 173, 0.2);
+    }
+
+    input[readonly] {
+      background-color: #f6f2ff;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    button {
+      background: linear-gradient(to right, #8e2de2, #6a0dad);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.3s ease-in-out;
+      font-weight: 500;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 5px 12px rgba(106, 13, 173, 0.25);
+    }
+
+    .logout {
+      background: #e74c3c;
+    }
+
+    .logout:hover {
+      background: #d93425;
+      box-shadow: 0 5px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      text-align: center;
+      animation: slideDown 0.5s ease;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-button" style="text-decoration: none;"><button type="button" class="btn">← Back to Home</button></a>
+  <div class="container">
+    <h1>👤 My Profile</h1>
+
+    <div id="alertBox"></div>
+
+    <form id="profileForm" method="POST" action="/about">
+      <div class="section">
+        <h2>📋 Personal Information</h2>
+        <div class="info-grid">
+          <div>
+            <label>Full Name *</label>
+            <input type="text" name="name" value="<%= currentUser.name %>" required>
+          </div>
+          <div>
+            <label>Age</label>
+            <input type="number" name="age" value="<%= currentUser.age || '' %>" min="1" max="150">
+          </div>
+          <div>
+            <label>Gender</label>
+            <select name="gender">
+              <option value="NA" <%= currentUser.gender === 'NA' ? 'selected' : '' %>>Not Specified</option>
+              <option value="Male" <%= currentUser.gender === 'Male' ? 'selected' : '' %>>Male</option>
+              <option value="Female" <%= currentUser.gender === 'Female' ? 'selected' : '' %>>Female</option>
+              <option value="Other" <%= currentUser.gender === 'Other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Email Address</label>
+            <input type="email" value="<%= currentUser.email %>" readonly>
+          </div>
+          <div>
+            <label>Patient ID</label>
+            <input type="text" value="<%= currentUser._id %>" readonly>
+          </div>
+          <div>
+            <label>Address</label>
+            <textarea name="address" rows="2"><%= currentUser.address || '' %></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>💉 Health Information</h2>
+        <div class="info-grid">
+          <div>
+            <label>Height (cm)</label>
+            <input type="number" name="height" id="height" value="<%= currentUser.height || '' %>" min="50" max="300" step="0.1">
+          </div>
+          <div>
+            <label>Weight (kg)</label>
+            <input type="number" name="weight" id="weight" value="<%= currentUser.weight || '' %>" min="10" max="500" step="0.1">
+          </div>
+          <div>
+            <label>BMI</label>
+            <input type="text" id="bmi" readonly placeholder="Auto-calculated">
+          </div>
+          <div>
+            <label>Blood Group</label>
+            <select name="bloodGroup">
+              <option value="">Select Blood Group</option>
+              <option value="A+" <%= currentUser.bloodGroup === 'A+' ? 'selected' : '' %>>A+</option>
+              <option value="A-" <%= currentUser.bloodGroup === 'A-' ? 'selected' : '' %>>A-</option>
+              <option value="B+" <%= currentUser.bloodGroup === 'B+' ? 'selected' : '' %>>B+</option>
+              <option value="B-" <%= currentUser.bloodGroup === 'B-' ? 'selected' : '' %>>B-</option>
+              <option value="O+" <%= currentUser.bloodGroup === 'O+' ? 'selected' : '' %>>O+</option>
+              <option value="O-" <%= currentUser.bloodGroup === 'O-' ? 'selected' : '' %>>O-</option>
+              <option value="AB+" <%= currentUser.bloodGroup === 'AB+' ? 'selected' : '' %>>AB+</option>
+              <option value="AB-" <%= currentUser.bloodGroup === 'AB-' ? 'selected' : '' %>>AB-</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>⚠️ Critical Health Details (Optional)</h2>
+        <textarea name="critical" rows="3" placeholder="List any allergies, chronic conditions, or important medical information..."><%= currentUser.critical || '' %></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit">💾 Save Changes</button>
+        <button type="button" class="logout" onclick="logout()">🚪 Logout</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Auto BMI Calculation
+    function calculateBMI() {
+      const height = parseFloat(document.getElementById("height").value);
+      const weight = parseFloat(document.getElementById("weight").value);
+      if (height > 0 && weight > 0) {
+        const bmi = (weight / ((height / 100) ** 2)).toFixed(1);
+        document.getElementById("bmi").value = bmi + " kg/m²";
+      } else {
+        document.getElementById("bmi").value = "";
+      }
+    }
+
+    document.getElementById("height").addEventListener("input", calculateBMI);
+    document.getElementById("weight").addEventListener("input", calculateBMI);
+
+    // Logout
+    function logout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "/logout";
+      }
+    }
+
+    // Initialize BMI on load
+    calculateBMI();
+
+    // Check for success message in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      showAlert('Profile updated successfully!', 'success');
+    }
+
+    function showAlert(message, type) {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => {
+        alertBox.innerHTML = '';
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Recommendations - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            height: calc(100vh - 40px);
+        }
+
+        .doctors-section {
+            flex: 2;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-chatbot-section {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+        }
+
+        .header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .patient-info {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .patient-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .patient-info p {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .patient-info strong {
+            color: #764ba2;
+        }
+
+        .doctor-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .doctor-card.highlighted {
+            border: 3px solid #4caf50;
+            background: linear-gradient(135deg, #4caf5010 0%, #4caf5020 100%);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .doctor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .doctor-name {
+            font-size: 20px;
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .specialty-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .doctor-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .detail-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .call-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .video-call-btn, .phone-call-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .video-call-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .video-call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .phone-call-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .phone-call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .video-call-btn:active, .phone-call-btn:active {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .chat-header h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.ai {
+            text-align: left;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .message.ai .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user .message-content {
+            background: #e0e0e0;
+            color: #333;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .suggest-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .suggest-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .suggest-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .recommended-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .doctors-section, .ai-chatbot-section {
+                flex: 1;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Doctors List Section -->
+        <div class="doctors-section">
+            <div class="header">
+                <h1>🏥 Recommended Doctors</h1>
+                <p>Based on your symptoms and medical needs</p>
+            </div>
+
+            <div class="patient-info" id="patientInfo">
+                <h3>📋 Patient Information</h3>
+                <form id="patientForm" style="display: grid; gap: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Name:</label>
+                            <input type="text" id="patientName" placeholder="Enter your name" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Age:</label>
+                            <input type="number" id="patientAge" placeholder="Age" required min="1" max="120" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Gender:</label>
+                        <select id="patientGender" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Contact Number:</label>
+                        <input type="tel" id="patientContact" placeholder="Enter phone number" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Problem:</label>
+                        <input type="text" id="patientProblem" placeholder="Main health concern" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #667eea;">Symptoms:</label>
+                        <textarea id="patientSymptoms" placeholder="Describe your symptoms..." required rows="3" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        ✅ Submit Patient Details
+                    </button>
+                </form>
+                <div id="patientDisplay" style="display: none;">
+                    <p><strong>Name:</strong> <span id="displayName"></span></p>
+                    <p><strong>Age:</strong> <span id="displayAge"></span></p>
+                    <p><strong>Gender:</strong> <span id="displayGender"></span></p>
+                    <p><strong>Contact:</strong> <span id="displayContact"></span></p>
+                    <p><strong>Problem:</strong> <span id="displayProblem"></span></p>
+                    <p><strong>Symptoms:</strong> <span id="displaySymptoms"></span></p>
+                    <button onclick="editPatientInfo()" style="background: #f5f5f5; color: #666; border: 2px solid #e0e0e0; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px;">
+                        ✏️ Edit Details
+                    </button>
+                </div>
+            </div>
+
+            <div id="doctorsList">
+                <!-- Doctors will be loaded here -->
+            </div>
+        </div>
+
+        <!-- AI Chatbot Section -->
+        <div class="ai-chatbot-section">
+            <div class="chat-header">
+                <h2><b>🤖 AI Doctor Recommender</b></h2>
+                <p>Describe your symptoms for personalized recommendations</p>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-content">
+                        Hello! I'm your AI health assistant. I've reviewed your problem and symptoms. You can describe your condition in more detail here, and I'll help you find the most suitable doctors from our database. Feel free to mention specific symptoms, duration, severity, or any other concerns!
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <textarea 
+                    id="chatInput" 
+                    class="chat-input" 
+                    placeholder="Describe your symptoms in detail... (e.g., 'I have severe headaches for 3 days with blurred vision and nausea')"
+                ></textarea>
+                <button class="suggest-btn" onclick="suggestDoctors()">
+                    🔍 Suggest Me Doctors
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const doctorsDatabase = [
+            {"id":1,"name":"Dr. Maya Iyer","specialty":"Neurology","degrees":"MBBS","medical_college":"Maulana Azad Medical College","years_experience":29,"phone":"+91-98193349856","city":"Kolkata","state":"West Bengal","available_time":"Sat 11:00-13:00; Tue 18:00-20:00"},
+            {"id":2,"name":"Dr. Pooja Pandey","specialty":"Ophthalmology","degrees":"MBBS","medical_college":"JIPMER","years_experience":36,"phone":"+91-98550455977","city":"Mumbai","state":"Maharashtra","available_time":"Fri 13:00-15:00; Mon 10:00-12:00"},
+            {"id":3,"name":"Dr. Sonal Mehta","specialty":"Gastrosurgeon","degrees":"MBBS, MD, DM","medical_college":"Madras Medical College","years_experience":36,"phone":"+91-91199585092","city":"Lucknow","state":"Uttar Pradesh","available_time":"Fri 10:00-14:00"},
+            {"id":11,"name":"Dr. Anita Mehta","specialty":"General Medicine","degrees":"MBBS, MS","medical_college":"JIPMER","years_experience":38,"phone":"+91-94786066793","city":"Kolkata","state":"West Bengal","available_time":"Fri 17:00-19:00; Tue 14:00-17:00"},
+            {"id":14,"name":"Dr. Pooja Sood","specialty":"Neurology","degrees":"MBBS, MD","medical_college":"Vardhman Mahavir Medical College","years_experience":29,"phone":"+91-95570406376","city":"Chennai","state":"Tamil Nadu","available_time":"Fri 18:00-21:00"},
+            {"id":15,"name":"Dr. Rohit Agarwal","specialty":"Ophthalmology","degrees":"MBBS","medical_college":"Maulana Azad Medical College","years_experience":6,"phone":"+91-90345824373","city":"Visakhapatnam","state":"Andhra Pradesh","available_time":"Thu,Sat,Sun 09:00-12:00"},
+            {"id":16,"name":"Dr. Harish Chatterjee","specialty":"ENT","degrees":"MBBS, MD","medical_college":"Maulana Azad Medical College","years_experience":13,"phone":"+91-99607526654","city":"Kochi","state":"Kerala","available_time":"Sat,Fri 13:00-17:00"},
+            {"id":17,"name":"Dr. Arjun Reddy","specialty":"Psychiatry","degrees":"MBBS, DNB","medical_college":"Seth GS Medical College","years_experience":22,"phone":"+91-90823019672","city":"Bhopal","state":"Madhya Pradesh","available_time":"Tue 15:00-18:00"},
+            {"id":21,"name":"Dr. Pooja Gupta","specialty":"Neurology","degrees":"MBBS","medical_college":"All India Institute of Medical Sciences","years_experience":27,"phone":"+91-97639931481","city":"Visakhapatnam","state":"Andhra Pradesh","available_time":"Thu 07:00-11:00"},
+            {"id":34,"name":"Dr. Karan Bose","specialty":"Neurology","degrees":"MBBS, MS","medical_college":"All India Institute of Medical Sciences","years_experience":15,"phone":"+91-93491079829","city":"Surat","state":"Gujarat","available_time":"Tue 10:00-12:00"},
+            {"id":36,"name":"Dr. Zoya Rao","specialty":"Neurology","degrees":"MBBS, MD, DM","medical_college":"St. John's Medical College","years_experience":11,"phone":"+91-90426283245","city":"Bengaluru","state":"Karnataka","available_time":"Thu 15:00-17:00"},
+            {"id":39,"name":"Dr. Maya Seth","specialty":"Neurology","degrees":"MBBS, MD","medical_college":"King Edward Memorial Hospital","years_experience":23,"phone":"+91-90906341966","city":"Ahmedabad","state":"Gujarat","available_time":"Wed,Thu,Sun 13:00-17:00"},
+            {"id":46,"name":"Dr. Ramesh Verma","specialty":"Ophthalmology","degrees":"MBBS, MS","medical_college":"Lady Hardinge Medical College","years_experience":45,"phone":"+91-92595744935","city":"Patna","state":"Bihar","available_time":"Thu 15:00-19:00"},
+            {"id":47,"name":"Dr. Pooja Bhattacharya","specialty":"Dermatology","degrees":"MBBS, MD","medical_college":"Madras Medical College","years_experience":17,"phone":"+91-97120812641","city":"Ahmedabad","state":"Gujarat","available_time":"Sat 15:00-18:00"},
+            {"id":48,"name":"Dr. Irfan Singh","specialty":"General Medicine","degrees":"MBBS, MD","medical_college":"Maulana Azad Medical College","years_experience":32,"phone":"+91-93235528741","city":"Mumbai","state":"Maharashtra","available_time":"Tue 11:00-13:00; Sun 15:00-17:00"},
+            {"id":52,"name":"Dr. Nidhi Bhatt","specialty":"Neurology","degrees":"MBBS, DNB","medical_college":"Seth GS Medical College","years_experience":37,"phone":"+91-94761330848","city":"Noida","state":"Uttar Pradesh","available_time":"Sun 12:00-16:00; Thu 09:00-11:00"},
+            {"id":62,"name":"Dr. Tanya Prasad","specialty":"Cardiology","degrees":"MBBS, MD","medical_college":"St. John's Medical College","years_experience":40,"phone":"+91-93771641650","city":"Patna","state":"Bihar","available_time":"Fri,Wed 17:00-19:00"},
+            {"id":74,"name":"Dr. Meera Sharma","specialty":"Neurology","degrees":"MBBS, MD, DM","medical_college":"St. John's Medical College","years_experience":12,"phone":"+91-92579476614","city":"Jaipur","state":"Rajasthan","available_time":"Fri,Sat,Sun 13:00-17:00"},
+            {"id":79,"name":"Dr. Siddharth Mehta","specialty":"Cardiology","degrees":"MBBS, MD, DM","medical_college":"All India Institute of Medical Sciences","years_experience":25,"phone":"+91-95562446417","city":"Mumbai","state":"Maharashtra","available_time":"Thu 12:00-16:00"},
+            {"id":85,"name":"Dr. Neha Malhotra","specialty":"Neurology","degrees":"MBBS, MS","medical_college":"Kasturba Medical College","years_experience":35,"phone":"+91-95669998399","city":"Surat","state":"Gujarat","available_time":"Tue 10:00-12:00"}
+        ];
+
+        let allDoctors = [...doctorsDatabase];
+        let recommendedDoctorIds = [];
+
+        // Load patient data
+        window.onload = function() {
+            loadPatientData();
+            displayDoctors(allDoctors);
+            setupPatientForm();
+        };
+
+        function setupPatientForm() {
+            const form = document.getElementById('patientForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitPatientDetails();
+            });
+        }
+
+        function submitPatientDetails() {
+            const name = document.getElementById('patientName').value;
+            const age = document.getElementById('patientAge').value;
+            const gender = document.getElementById('patientGender').value;
+            const contact = document.getElementById('patientContact').value;
+            const problem = document.getElementById('patientProblem').value;
+            const symptoms = document.getElementById('patientSymptoms').value;
+
+            // Display submitted data
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayAge').textContent = age;
+            document.getElementById('displayGender').textContent = gender;
+            document.getElementById('displayContact').textContent = contact;
+            document.getElementById('displayProblem').textContent = problem;
+            document.getElementById('displaySymptoms').textContent = symptoms;
+
+            // Hide form, show display
+            document.getElementById('patientForm').style.display = 'none';
+            document.getElementById('patientDisplay').style.display = 'block';
+
+            // Show success message
+            alert('✅ Patient details submitted successfully!');
+
+            // Scroll to doctors section
+            document.querySelector('.doctors-section').scrollTop = 0;
+        }
+
+        function editPatientInfo() {
+            document.getElementById('patientForm').style.display = 'grid';
+            document.getElementById('patientDisplay').style.display = 'none';
+        }
+
+        function loadPatientData() {
+            const patientData = localStorage.getItem('patientData');
+            if (patientData) {
+                const data = JSON.parse(patientData);
+                document.getElementById('patientName').value = data.name;
+                document.getElementById('patientAge').value = data.age;
+                document.getElementById('patientGender').value = data.gender || '';
+                document.getElementById('patientContact').value = data.contact;
+                document.getElementById('patientProblem').value = data.problem;
+                document.getElementById('patientSymptoms').value = data.symptoms;
+                
+                // Auto-submit if data exists
+                submitPatientDetails();
+            }
+        }
+
+        function displayDoctors(doctors, highlightIds = []) {
+            const doctorsList = document.getElementById('doctorsList');
+            
+            if (doctors.length === 0) {
+                doctorsList.innerHTML = '<div class="no-doctors"><h3>No doctors found matching your criteria</h3></div>';
+                return;
+            }
+
+            doctorsList.innerHTML = doctors.map(doctor => `
+                <div class="doctor-card ${highlightIds.includes(doctor.id) ? 'highlighted' : ''}">
+                    <div class="doctor-header">
+                        <div>
+                            <div class="doctor-name">
+                                ${doctor.name}
+                                ${highlightIds.includes(doctor.id) ? '<span class="recommended-badge">✓ AI RECOMMENDED</span>' : ''}
+                            </div>
+                            <span class="specialty-badge">${doctor.specialty}</span>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="detail-item">
+                            <strong>📚 Qualifications:</strong>
+                            ${doctor.degrees}
+                        </div>
+                        <div class="detail-item">
+                            <strong>🏥 Medical College:</strong>
+                            ${doctor.medical_college}
+                        </div>
+                        <div class="detail-item">
+                            <strong>⏱️ Experience:</strong>
+                            ${doctor.years_experience} years
+                        </div>
+                        <div class="detail-item">
+                            <strong>📍 Location:</strong>
+                            ${doctor.city}, ${doctor.state}
+                        </div>
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <strong>🕒 Available:</strong>
+                            ${doctor.available_time}
+                        </div>
+                    </div>
+                    <div class="call-buttons">
+                        <button class="video-call-btn" onclick="startVideoCall('${doctor.name}', '${doctor.phone}')">
+                            📹 Video Call
+                        </button>
+                        <button class="phone-call-btn" onclick="startPhoneCall('${doctor.phone}')">
+                            📞 Call Now
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function suggestDoctors() {
+            const userInput = document.getElementById('chatInput').value.trim();
+            
+            if (!userInput) {
+                alert('Please describe your symptoms first!');
+                return;
+            }
+
+            // Add user message to chat
+            addMessage(userInput, 'user');
+            
+            // Clear input
+            document.getElementById('chatInput').value = '';
+            
+            // AI Analysis - Match keywords to specialties
+            const analysisResult = analyzeSymptoms(userInput);
+            
+            // Filter doctors based on analysis
+            const filteredDoctors = filterDoctorsBySpecialty(analysisResult.specialties, analysisResult.location);
+            recommendedDoctorIds = filteredDoctors.map(d => d.id);
+            
+            // Add AI response to chat
+            addMessage(analysisResult.message, 'ai');
+            
+            // Display filtered doctors
+            displayDoctors(filteredDoctors, recommendedDoctorIds);
+            
+            // Scroll to top of doctors list
+            document.querySelector('.doctors-section').scrollTop = 0;
+        }
+
+        function analyzeSymptoms(input) {
+            const lowerInput = input.toLowerCase();
+            const specialties = new Set();
+            let location = null;
+            let message = '';
+
+            // Keyword mapping to specialties
+            const keywords = {
+                'Neurology': ['headache', 'migraine', 'brain', 'seizure', 'stroke', 'tremor', 'numbness', 'dizziness', 'memory', 'neurological', 'head pain', 'nerve'],
+                'Ophthalmology': ['eye', 'vision', 'sight', 'blurred', 'cataract', 'glaucoma', 'blind', 'see', 'visual', 'retina'],
+                'Cardiology': ['heart', 'chest pain', 'cardiac', 'blood pressure', 'hypertension', 'palpitation', 'breathless', 'cardiovascular'],
+                'Gastrosurgeon': ['stomach', 'abdomen', 'digestive', 'intestine', 'liver', 'gallbladder', 'pancreas', 'hernia', 'abdominal pain'],
+                'Pulmonology': ['lung', 'breathing', 'asthma', 'cough', 'respiratory', 'pneumonia', 'bronchitis', 'shortness of breath'],
+                'Orthopedics': ['bone', 'joint', 'fracture', 'arthritis', 'knee', 'back pain', 'spine', 'shoulder', 'hip', 'muscle pain'],
+                'ENT': ['ear', 'nose', 'throat', 'sinus', 'tonsil', 'hearing', 'vertigo', 'voice', 'nasal'],
+                'Dermatology': ['skin', 'rash', 'acne', 'eczema', 'psoriasis', 'allergy', 'itching', 'hair', 'nail'],
+                'Psychiatry': ['depression', 'anxiety', 'stress', 'mental', 'mood', 'sleep', 'panic', 'psychological', 'bipolar'],
+                'Pediatrics': ['child', 'infant', 'baby', 'vaccination', 'growth', 'development'],
+                'Nephrology': ['kidney', 'urine', 'renal', 'dialysis', 'urinary'],
+                'Endocrinology': ['diabetes', 'thyroid', 'hormone', 'insulin', 'metabolism', 'sugar'],
+                'General Medicine': ['fever', 'cold', 'flu', 'fatigue', 'weakness', 'general', 'checkup', 'tired']
+            };
+
+            // Extract location from input
+            const cities = ['kolkata', 'mumbai', 'delhi', 'chennai', 'bengaluru', 'bangalore', 'hyderabad', 'pune', 'ahmedabad', 
+                          'surat', 'jaipur', 'lucknow', 'kanpur', 'nagpur', 'visakhapatnam', 'bhopal', 'patna', 'vadodara',
+                          'ghaziabad', 'ludhiana', 'agra', 'nashik', 'faridabad', 'meerut', 'rajkot', 'varanasi', 'srinagar',
+                          'aurangabad', 'dhanbad', 'amritsar', 'navi mumbai', 'allahabad', 'ranchi', 'howrah', 'coimbatore',
+                          'jabalpur', 'gwalior', 'vijayawada', 'jodhpur', 'madurai', 'raipur', 'kota', 'chandigarh', 
+                          'gurgaon', 'guwahati', 'solapur', 'hubli', 'thiruvananthapuram', 'kochi', 'mysore', 'noida'];
+            
+            const states = ['west bengal', 'maharashtra', 'delhi', 'tamil nadu', 'karnataka', 'telangana', 'gujarat', 
+                          'rajasthan', 'uttar pradesh', 'madhya pradesh', 'bihar', 'kerala', 'andhra pradesh', 'haryana', 'chandigarh'];
+
+            // Check for location mentions
+            for (const city of cities) {
+                if (lowerInput.includes(city)) {
+                    location = city;
+                    break;
+                }
+            }
+            
+            if (!location) {
+                for (const state of states) {
+                    if (lowerInput.includes(state)) {
+                        location = state;
+                        break;
+                    }
+                }
+            }
+
+            // Find matching specialties
+            for (const [specialty, words] of Object.entries(keywords)) {
+                for (const word of words) {
+                    if (lowerInput.includes(word)) {
+                        specialties.add(specialty);
+                        break;
+                    }
+                }
+            }
+
+            // Generate AI response
+            if (specialties.size > 0 || location) {
+                let parts = [];
+                
+                if (specialties.size > 0) {
+                    const specialtyList = Array.from(specialties).join(', ');
+                    parts.push(`specialists in: ${specialtyList}`);
+                }
+                
+                if (location) {
+                    parts.push(`doctors in ${location.charAt(0).toUpperCase() + location.slice(1)}`);
+                }
+                
+                message = `Based on your request, I recommend ${parts.join(' and ')}. I've filtered the doctors list to show the most relevant specialists for your needs. These doctors are now highlighted with a green border and "AI RECOMMENDED" badge.`;
+            } else {
+                specialties.add('General Medicine');
+                message = `I recommend starting with a General Medicine specialist who can evaluate your symptoms and provide appropriate guidance or referrals if needed.`;
+            }
+
+            // If no specialty but location, show all doctors in that location
+            if (specialties.size === 0 && location) {
+                // Will show all specialties for that location
+            }
+
+            return {
+                specialties: Array.from(specialties),
+                location: location,
+                message: message
+            };
+        }
+
+        function filterDoctorsBySpecialty(specialties, location = null) {
+            let filtered = allDoctors;
+            
+            // Filter by specialty if provided
+            if (specialties.length > 0) {
+                filtered = filtered.filter(doctor => 
+                    specialties.includes(doctor.specialty)
+                );
+            }
+            
+            // Filter by location if provided
+            if (location) {
+                filtered = filtered.filter(doctor => 
+                    doctor.city.toLowerCase().includes(location.toLowerCase()) || 
+                    doctor.state.toLowerCase().includes(location.toLowerCase())
+                );
+            }
+            
+            // Sort by experience
+            return filtered.sort((a, b) => b.years_experience - a.years_experience);
+        }
+
+        function addMessage(content, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function startVideoCall(doctorName, phone) {
+            // Generate a Google Meet link (in real app, this would be generated server-side)
+            const meetLink = `https://meet.google.com/new`;
+            
+            // Show alert with meet link
+            alert(`📹 Video Call with ${doctorName}\n\nGoogle Meet Link:\n${meetLink}\n\nThe doctor will be notified and join the call shortly.`);
+            
+            // Open Google Meet in new tab
+            window.open(meetLink, '_blank');
+        }
+
+        function startPhoneCall(phone) {
+            // Initiate direct phone call
+            window.location.href = `tel:${phone}`;
+            
+            // Alternative: Show confirmation
+            setTimeout(() => {
+                alert(`📞 Calling ${phone}...\n\nYour phone's dialer should open automatically.`);
+            }, 100);
+        }
+    </script>
+</body>
+</html>

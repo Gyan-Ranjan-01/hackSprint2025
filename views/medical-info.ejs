@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Information</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 80px auto 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .result pre {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .common-medicines {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .common-medicines h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .medicine-chip {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .medicine-chip:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="/index" class="back-button"><button>← Back</button></a>
+
+    <div class="container">
+        <div class="header">
+            <h1>💊 Medicine Information</h1>
+            <p>Learn about medicines and their uses</p>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>Medicine Name:</label>
+                <input type="text" id="medicineName" placeholder="e.g., Paracetamol, Aspirin, Ibuprofen">
+            </div>
+
+            <button onclick="getMedicineInfo()" id="medicineBtn">Get Information</button>
+
+            <div class="common-medicines">
+                <h4>Common Medicines:</h4>
+                <span class="medicine-chip" onclick="searchMedicine('Paracetamol')">Paracetamol</span>
+                <span class="medicine-chip" onclick="searchMedicine('Aspirin')">Aspirin</span>
+                <span class="medicine-chip" onclick="searchMedicine('Ibuprofen')">Ibuprofen</span>
+                <span class="medicine-chip" onclick="searchMedicine('Amoxicillin')">Amoxicillin</span>
+                <span class="medicine-chip" onclick="searchMedicine('Omeprazole')">Omeprazole</span>
+                <span class="medicine-chip" onclick="searchMedicine('Metformin')">Metformin</span>
+            </div>
+            
+            <div class="loading" id="loading">Fetching information...</div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function searchMedicine(name) {
+            document.getElementById('medicineName').value = name;
+            getMedicineInfo();
+        }
+
+        async function getMedicineInfo() {
+            const medicineName = document.getElementById('medicineName').value.trim();
+
+            if (!medicineName) {
+                alert('Please enter a medicine name');
+                return;
+            }
+
+            const btn = document.getElementById('medicineBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch('/api/medicine-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ medicineName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `<h3>${escapeHtml(medicineName)}</h3><pre>${escapeHtml(data.info)}</pre>`;
+                } else {
+                    result.innerHTML = `<p style="color: red;">Error: ${escapeHtml(data.error)}</p>`;
+                }
+
+                result.classList.add('show');
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Connection error. Please try again.</p>`;
+                result.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('medicineName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') getMedicineInfo();
+        });
+    </script>
+</body>
+</html>

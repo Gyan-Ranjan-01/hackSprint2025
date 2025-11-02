@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Health Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 75%;
+            animation: fadeIn 0.3s;
+            clear: both;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            float: right;
+        }
+
+        .message.bot {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            float: left;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            font-style: italic;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+    </style>
+</head>
+<body>
+    <a href="/index" class="back-button">← Back</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>💬 AI Health Chatbot</h1>
+            <p>Chat with Dr. AI about your health concerns</p>
+        </div>
+
+        <div class="card">
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-state">👋 Hello! I'm Dr. AI. How can I help you today?</div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="chatInput" placeholder="Ask me about your symptoms...">
+                <button onclick="sendMessage()" id="sendBtn">Send</button>
+            </div>
+
+            <button onclick="clearChat()" class="clear-btn">Clear Chat</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const btn = document.getElementById('sendBtn');
+            
+            const emptyState = messagesDiv.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+            
+            messagesDiv.innerHTML += `<div class="message user">${escapeHtml(message)}</div>`;
+            messagesDiv.innerHTML += '<div style="clear:both"></div>';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            input.value = '';
+            btn.disabled = true;
+            btn.textContent = 'Thinking...';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    messagesDiv.innerHTML += `<div class="message bot">${escapeHtml(data.reply)}</div>`;
+                } else {
+                    messagesDiv.innerHTML += `<div class="message bot">Error: ${escapeHtml(data.error)}</div>`;
+                }
+                
+                messagesDiv.innerHTML += '<div style="clear:both"></div>';
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } catch (error) {
+                messagesDiv.innerHTML += `<div class="message bot">Connection error. Please try again.</div>`;
+                messagesDiv.innerHTML += '<div style="clear:both"></div>';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send';
+            }
+        }
+
+        function clearChat() {
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = '<div class="empty-state">👋 Hello! I\'m Dr. AI. How can I help you today?</div>';
+            fetch('/api/clear-chat', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare AI Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding: 40px 0;
+        }
+
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .feature-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+            font-size: 1em;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online .status-dot {
+            background: #28a745;
+        }
+
+        .status-indicator.online {
+            color: #28a745;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button"><button type="button" class="btn btn-info">← Back to Home</button></a>
+    <div class="status-indicator online">
+        <span class="status-dot"></span>
+        <span>AI Ready</span>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🏥 Healthcare AI Platform</h1>
+            <p class="subtitle">Your Complete AI-Powered Health Assistant</p>
+        </header>
+
+        <div class="features-grid">
+            <a href="/chatbot" class="feature-card">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">AI Health Chatbot</div>
+                <div class="feature-description">
+                    Chat with Dr. AI about your symptoms and get instant health guidance
+                </div>
+            </a>
+
+            <a href="/symptom-analysis" class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-title">Symptom Analysis</div>
+                <div class="feature-description">
+                    Get detailed analysis of your symptoms with AI-powered assessment
+                </div>
+            </a>
+
+            <a href="/report-summary" class="feature-card">
+                <div class="feature-icon">📄</div>
+                <div class="feature-title">Report Summary</div>
+                <div class="feature-description">
+                    Upload medical reports and get easy-to-understand summaries
+                </div>
+            </a>
+
+            <a href="/medicine-info" class="feature-card">
+                <div class="feature-icon">💊</div>
+                <div class="feature-title">Medicine Information</div>
+                <div class="feature-description">
+                    Learn about medicines, their uses, and side effects
+                </div>
+            </a>
+
+            <a href="/health-tips" class="feature-card">
+                <div class="feature-icon">💡</div>
+                <div class="feature-title">Health Tips</div>
+                <div class="feature-description">
+                    Get personalized health tips based on your lifestyle
+                </div>
+            </a>
+
+            <a href="/diet-plan" class="feature-card">
+                <div class="feature-icon">🥗</div>
+                <div class="feature-title">Diet Plan Generator</div>
+                <div class="feature-description">
+                    Create customized meal plans for your health goals
+                </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

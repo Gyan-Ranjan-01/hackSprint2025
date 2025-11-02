@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Summary</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js'></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .upload-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .upload-section input[type="file"] {
+            display: none;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .result pre {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .ocr-progress {
+            margin-top: 10px;
+            color: #667eea;
+            font-size: 14px;
+            display: none;
+        }
+
+        .ocr-progress.show {
+            display: block;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            margin-top: 5px;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <a href="/index" class="back-button">← Back</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📄 Report Summary</h1>
+            <p>Get easy-to-understand summaries of your medical reports</p>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>Report Type:</label>
+                <select id="reportType">
+                    <option value="Blood Test">Blood Test</option>
+                    <option value="X-Ray">X-Ray</option>
+                    <option value="MRI">MRI</option>
+                    <option value="CT Scan">CT Scan</option>
+                    <option value="Ultrasound">Ultrasound</option>
+                    <option value="General Checkup">General Checkup</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="upload-section">
+                <label for="imageUpload" class="upload-btn">📷 Upload Report Image</label>
+                <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)">
+                <img id="previewImage" class="preview-image" alt="Report Preview">
+                <div class="ocr-progress" id="ocrProgress">Extracting text from image...</div>
+            </div>
+
+            <div class="divider">OR</div>
+
+            <div class="input-group">
+                <label>Paste Your Medical Report:</label>
+                <textarea id="reportText" placeholder="Paste the content of your medical report here or upload an image above..."></textarea>
+                <button class="clear-btn" onclick="clearText()" style="width: auto; padding: 8px 20px; margin-top: 5px;">Clear Text</button>
+            </div>
+
+            <button onclick="summarizeReport()" id="summaryBtn">Summarize Report</button>
+            
+            <div class="loading" id="loading">Analyzing your report...</div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const previewImage = document.getElementById('previewImage');
+            const ocrProgress = document.getElementById('ocrProgress');
+            const reportText = document.getElementById('reportText');
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+
+            // Show progress
+            ocrProgress.classList.add('show');
+            reportText.value = 'Extracting text from image, please wait...';
+
+            try {
+                // Perform OCR using Tesseract.js
+                const result = await Tesseract.recognize(
+                    file,
+                    'eng',
+                    {
+                        logger: info => {
+                            if (info.status === 'recognizing text') {
+                                ocrProgress.textContent = `Extracting text... ${Math.round(info.progress * 100)}%`;
+                            }
+                        }
+                    }
+                );
+
+                // Extract and set the text
+                const extractedText = result.data.text.trim();
+                
+                if (extractedText) {
+                    reportText.value = extractedText;
+                    ocrProgress.textContent = '✅ Text extracted successfully!';
+                    setTimeout(() => {
+                        ocrProgress.classList.remove('show');
+                    }, 2000);
+                } else {
+                    reportText.value = '';
+                    ocrProgress.textContent = '❌ No text found in image. Please try another image or paste text manually.';
+                    setTimeout(() => {
+                        ocrProgress.classList.remove('show');
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('OCR Error:', error);
+                reportText.value = '';
+                ocrProgress.textContent = '❌ Error extracting text. Please paste text manually.';
+                setTimeout(() => {
+                    ocrProgress.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function clearText() {
+            document.getElementById('reportText').value = '';
+            document.getElementById('previewImage').classList.remove('show');
+            document.getElementById('imageUpload').value = '';
+            document.getElementById('result').classList.remove('show');
+        }
+
+        async function summarizeReport() {
+            const reportText = document.getElementById('reportText').value.trim();
+            const reportType = document.getElementById('reportType').value;
+
+            if (!reportText || reportText === 'Extracting text from image, please wait...') {
+                alert('Please paste your medical report or wait for image text extraction to complete');
+                return;
+            }
+
+            const btn = document.getElementById('summaryBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch('/api/summarize-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reportText, reportType })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `<h3>Summary:</h3><pre>${escapeHtml(data.summary)}</pre>`;
+                } else {
+                    result.innerHTML = `<p style="color: red;">Error: ${escapeHtml(data.error)}</p>`;
+                }
+
+                result.classList.add('show');
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Connection error. Please try again.</p>`;
+                result.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
