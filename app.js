@@ -10,6 +10,7 @@ const User = require("./models/user.js");
 const session = require("express-session");
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/hacksprint";
 
 // ==================== UTILITY FUNCTIONS ====================
 // Wrap async functions to catch errors
@@ -40,7 +41,7 @@ app.use(cors());
 
 // ==================== SESSION CONFIGURATION ====================
 const sessionConfig = {
-    secret: "thisshouldbeabettersecret!",
+    secret: process.env.SESSION_SECRET || "fallbackSecret",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -66,8 +67,8 @@ console.log(`🔑 API Key Status: ${process.env.GEMINI_API_KEY ? 'Configured ✓
 
 // ==================== MONGODB CONNECTION ====================
 async function main() {
-    console.log("mongodb://127.0.0.1:27017/hacksprint");
-    await mongoose.connect("mongodb://127.0.0.1:27017/hacksprint");
+    console.log("Connecting to MongoDB...HackSprint");
+    await mongoose.connect(dbUrl);
 }
 
 main()
@@ -104,12 +105,12 @@ app.get("/login", (req, res) => {
 
 app.post("/login", wrapAsync(async (req, res, next) => {
     const { email, password } = req.body;
-    
+
     // Validation
     if (!email || !password) {
         throw new AppError("Email and password are required", 400);
     }
-    
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -139,18 +140,18 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", wrapAsync(async (req, res, next) => {
     const { name, email, password } = req.body;
-    
+
     // Validation
     if (!name || !email || !password) {
         throw new AppError("All fields are required", 400);
     }
-    
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
         throw new AppError("Email already registered", 409);
     }
-    
+
     const user = new User({ name, email, password });
     await user.save();
 
@@ -213,14 +214,14 @@ app.get("/diet-plan", requireLogin, (req, res) => {
 // 1. Health Chatbot
 app.post('/api/chat', requireLogin, wrapAsync(async (req, res) => {
     const { message, sessionId = 'default' } = req.body;
-    
+
     if (!message) {
         throw new AppError('Message is required', 400);
     }
-    
+
     console.log(`💬 Chat [${sessionId}]: ${message}`);
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.7,
@@ -229,7 +230,7 @@ app.post('/api/chat', requireLogin, wrapAsync(async (req, res) => {
             maxOutputTokens: 300,
         }
     });
-    
+
     let chat;
     if (!chatSessions.has(sessionId)) {
         chat = model.startChat({
@@ -248,37 +249,37 @@ app.post('/api/chat', requireLogin, wrapAsync(async (req, res) => {
     } else {
         chat = chatSessions.get(sessionId);
     }
-    
+
     const result = await chat.sendMessage(message);
     const reply = result.response.text();
-    
+
     console.log(`🤖 Reply: ${reply.substring(0, 100)}...`);
-    
-    res.json({ 
+
+    res.json({
         reply,
         success: true,
-        sessionId 
+        sessionId
     });
 }));
 
 // 2. Symptom Analysis
 app.post('/api/analyze-symptoms', requireLogin, wrapAsync(async (req, res) => {
     const { symptoms, age, gender, duration } = req.body;
-    
+
     if (!symptoms) {
         throw new AppError('Symptoms are required', 400);
     }
-    
+
     console.log('🔍 Analyzing symptoms:', symptoms);
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 600,
         }
     });
-    
+
     const prompt = `You are a medical AI assistant. Analyze the following patient symptoms and provide a structured medical assessment.
 
 **Patient Information:**
@@ -319,33 +320,33 @@ Provide detailed, accurate, and helpful information while being clear this is pr
 
     const result = await model.generateContent(prompt);
     const analysis = result.response.text();
-    
+
     console.log('✅ Analysis complete');
-    
-    res.json({ 
+
+    res.json({
         analysis,
-        success: true 
+        success: true
     });
 }));
 
 // 3. Medical Report Summary
 app.post('/api/summarize-report', requireLogin, wrapAsync(async (req, res) => {
     const { reportText, reportType } = req.body;
-    
+
     if (!reportText) {
         throw new AppError('Report text is required', 400);
     }
-    
+
     console.log('📄 Summarizing report...');
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.4,
             maxOutputTokens: 500,
         }
     });
-    
+
     const prompt = `You are a medical AI assistant specializing in explaining medical reports to patients.
 
 **Report Type:** ${reportType || 'Medical Report'}
@@ -365,33 +366,33 @@ Use simple, non-technical language. Avoid medical jargon. Be clear and reassurin
 
     const result = await model.generateContent(prompt);
     const summary = result.response.text();
-    
+
     console.log('✅ Summary generated');
-    
-    res.json({ 
+
+    res.json({
         summary,
-        success: true 
+        success: true
     });
 }));
 
 // 4. Medicine Information
 app.post('/api/medicine-info', requireLogin, wrapAsync(async (req, res) => {
     const { medicineName } = req.body;
-    
+
     if (!medicineName) {
         throw new AppError('Medicine name is required', 400);
     }
-    
+
     console.log('💊 Getting info for:', medicineName);
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 400,
         }
     });
-    
+
     const prompt = `Provide accurate, patient-friendly information about the medicine: **${medicineName}**
 
 Include the following sections:
@@ -420,31 +421,31 @@ Keep information accurate and helpful. Use simple language.`;
 
     const result = await model.generateContent(prompt);
     const info = result.response.text();
-    
+
     console.log('✅ Medicine info retrieved');
-    
-    res.json({ 
+
+    res.json({
         info,
-        success: true 
+        success: true
     });
 }));
 
 // 5. Health Tips Generator
 app.post('/api/health-tips', requireLogin, wrapAsync(async (req, res) => {
     const { category, userProfile } = req.body;
-    
+
     console.log('💡 Generating tips for:', category);
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 500,
         }
     });
-    
+
     const profileStr = userProfile ? JSON.stringify(userProfile) : 'General audience';
-    
+
     const prompt = `Generate 5 practical, evidence-based health tips for the category: **${category || 'General Health'}**
 
 User Profile: ${profileStr}
@@ -465,29 +466,29 @@ Provide exactly 5 tips, numbered 1-5.`;
 
     const result = await model.generateContent(prompt);
     const tips = result.response.text();
-    
+
     console.log('✅ Tips generated');
-    
-    res.json({ 
+
+    res.json({
         tips,
-        success: true 
+        success: true
     });
 }));
 
 // 6. Diet Plan Generator
 app.post('/api/diet-plan', requireLogin, wrapAsync(async (req, res) => {
     const { goal, restrictions, preferences } = req.body;
-    
+
     console.log('🥗 Generating diet plan for goal:', goal);
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.6,
             maxOutputTokens: 800,
         }
     });
-    
+
     const prompt = `Create a personalized one-day diet plan.
 
 **Goal:** ${goal || 'General health'}
@@ -529,33 +530,33 @@ Make it practical, affordable, and easy to prepare.`;
 
     const result = await model.generateContent(prompt);
     const plan = result.response.text();
-    
+
     console.log('✅ Diet plan generated');
-    
-    res.json({ 
+
+    res.json({
         plan,
-        success: true 
+        success: true
     });
 }));
 
 // 7. Prescription Image Analysis
 app.post('/api/read-prescription', requireLogin, wrapAsync(async (req, res) => {
     const { imageBase64 } = req.body;
-    
+
     if (!imageBase64) {
         throw new AppError('Image data is required', 400);
     }
-    
+
     console.log('📸 Analyzing prescription image...');
-    
-    const model = genAI.getGenerativeModel({ 
+
+    const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
             temperature: 0.2,
             maxOutputTokens: 500,
         }
     });
-    
+
     const prompt = `Analyze this prescription image and extract all readable information.
 
 Provide:
@@ -583,8 +584,8 @@ Prescription date if visible
 
 Be accurate and clear. If something is unclear, state it explicitly.`;
 
-    const base64Data = imageBase64.includes(',') 
-        ? imageBase64.split(',')[1] 
+    const base64Data = imageBase64.includes(',')
+        ? imageBase64.split(',')[1]
         : imageBase64;
 
     const imageParts = [
@@ -598,12 +599,12 @@ Be accurate and clear. If something is unclear, state it explicitly.`;
 
     const result = await model.generateContent([prompt, ...imageParts]);
     const analysis = result.response.text();
-    
+
     console.log('✅ Prescription analyzed');
-    
-    res.json({ 
+
+    res.json({
         analysis,
-        success: true 
+        success: true
     });
 }));
 
@@ -614,10 +615,10 @@ app.post('/api/clear-chat', requireLogin, (req, res) => {
     const { sessionId = 'default' } = req.body;
     chatSessions.delete(sessionId);
     console.log(`🗑️ Cleared chat session: ${sessionId}`);
-    res.json({ 
-        success: true, 
+    res.json({
+        success: true,
         message: 'Chat history cleared',
-        sessionId 
+        sessionId
     });
 });
 
@@ -626,9 +627,9 @@ app.post('/api/clear-all-chats', requireLogin, (req, res) => {
     const count = chatSessions.size;
     chatSessions.clear();
     console.log(`🗑️ Cleared all ${count} chat sessions`);
-    res.json({ 
-        success: true, 
-        message: `Cleared ${count} chat sessions` 
+    res.json({
+        success: true,
+        message: `Cleared ${count} chat sessions`
     });
 });
 
@@ -646,7 +647,7 @@ app.get('/api/health', (req, res) => {
 // Test endpoint
 app.get('/api/test', (req, res) => {
     const isConfigured = !!process.env.GEMINI_API_KEY;
-    res.json({ 
+    res.json({
         status: 'Server is running',
         aiProvider: 'Google Gemini',
         geminiConfigured: isConfigured,
@@ -771,11 +772,12 @@ app.use((err, req, res, next) => {
 });
 
 // ==================== START SERVER ====================
-app.listen(8080, () => {
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
     console.log('\n' + '='.repeat(50));
     console.log('🏥 HEALTHCARE AI SERVER STARTED');
     console.log('='.repeat(50));
-    console.log('🚀 Server URL: http://localhost:8080');
+    console.log(`🚀 Server URL: http://localhost:${PORT}`);
     console.log(`🔑 API Key:    ${process.env.GEMINI_API_KEY ? '✓ Configured' : '✗ Missing'}`);
     console.log('🤖 AI Provider: Google Gemini');
     console.log('='.repeat(50) + '\n');
