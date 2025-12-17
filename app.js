@@ -222,7 +222,7 @@ app.post('/api/chat', requireLogin, wrapAsync(async (req, res) => {
     console.log(`💬 Chat [${sessionId}]: ${message}`);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.7,
             topK: 40,
@@ -273,7 +273,7 @@ app.post('/api/analyze-symptoms', requireLogin, wrapAsync(async (req, res) => {
     console.log('🔍 Analyzing symptoms:', symptoms);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 600,
@@ -340,7 +340,7 @@ app.post('/api/summarize-report', requireLogin, wrapAsync(async (req, res) => {
     console.log('📄 Summarizing report...');
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.4,
             maxOutputTokens: 500,
@@ -386,7 +386,7 @@ app.post('/api/medicine-info', requireLogin, wrapAsync(async (req, res) => {
     console.log('💊 Getting info for:', medicineName);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 400,
@@ -437,7 +437,7 @@ app.post('/api/health-tips', requireLogin, wrapAsync(async (req, res) => {
     console.log('💡 Generating tips for:', category);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 500,
@@ -482,7 +482,7 @@ app.post('/api/diet-plan', requireLogin, wrapAsync(async (req, res) => {
     console.log('🥗 Generating diet plan for goal:', goal);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.6,
             maxOutputTokens: 800,
@@ -550,7 +550,7 @@ app.post('/api/read-prescription', requireLogin, wrapAsync(async (req, res) => {
     console.log('📸 Analyzing prescription image...');
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0.2,
             maxOutputTokens: 500,
