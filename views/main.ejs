@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Hospital - Patient Portal</title>
+    <title>DocOnCall - Patient Portal</title>
     <style>
         * {
             margin: 0;
@@ -773,7 +773,7 @@
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <div class="sidebar-logo-icon">🏥</div>
-                <h2>AI Cure</h2>
+                <h2>DocOnCall</h2>
             </div>
         </div>
         <ul class="sidebar-menu">
@@ -874,7 +874,9 @@
                                 <div class="welcome-name"><%= currentUser.name %></div>
                                 <div class="welcome-text">Patient ID: <%= currentUser.id %></div>
                             </div>
-                            <div class="avatar">JD</div>
+                            <div class="avatar">
+                                <%= currentUser.name.charAt(0).toUpperCase() %>
+                            </div>
                         </div>
                         <div class="user-dropdown">
                             <a href="/about" style="text-decoration: none;"><div class="user-dropdown-item">
@@ -1023,8 +1025,8 @@
             </div> -->
 
             <footer>
-                <p>© 2025 AI Cure - Your health, our priority.</p>
-                <div class="emergency-badge">🚨 Emergency? Call 911 or visit nearest emergency room</div>
+                <p>© 2025 DocOnCall - Your health, our priority.</p>
+                <div class="emergency-badge">🚨 Emergency? Call 112 or visit nearest emergency room</div>
             </footer>
         </div>
     </div>
