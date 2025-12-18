@@ -121,14 +121,74 @@
             50% { opacity: 0.5; }
         }
 
+        /* MOBILE INDEX RESPONSIVENESS */
         @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            header {
+                padding: 20px 0;
+                margin-bottom: 30px;
+            }
+
             h1 {
-                font-size: 2em;
+                font-size: 2em; /* Smaller title */
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+                padding: 0 20px; /* Prevent text hitting edges */
             }
 
             .features-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* Force single column */
+                gap: 20px; /* Smaller gap */
+                margin-top: 20px;
             }
+
+            .feature-card {
+                padding: 25px 20px; /* Adjust padding */
+                display: flex;
+                align-items: center; /* Align icon and text horizontally */
+                text-align: left; /* easier to read list style */
+                gap: 20px;
+            }
+
+            /* Adjust Icon for horizontal layout */
+            .feature-icon {
+                font-size: 2.5em;
+                margin-bottom: 0; /* Remove bottom margin */
+                flex-shrink: 0; /* Prevent icon shrinking */
+            }
+
+            /* Container for text to keep it organized */
+            /* .feature-card div:last-child {
+                /* This targets the description implicitly if wrapped, 
+                   but since your HTML structure is flat, we target by class */
+            /* } */ 
+            
+            .feature-title {
+                margin-bottom: 5px;
+                font-size: 1.3em;
+            }
+
+            .feature-description {
+                font-size: 0.95em;
+                line-height: 1.4;
+            }
+            
+            /* Status indicator positioning */
+            .status-indicator {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+            
+            /* .back-button {
+                font-size: 1rem !important;  /* Hide back button on index if it's the home page */
+            /* } */ 
         }
     </style>
 </head>

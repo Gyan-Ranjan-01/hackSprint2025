@@ -236,6 +236,41 @@
                 flex-direction: column;
             }
         }
+        /* RESPONSIVE PATCH */
+        @media (max-width: 768px) {
+            /* Container Adjustments */
+            .container {
+                margin: 60px 15px 20px 15px; /* Less side margin */
+                width: auto;
+            }
+
+            .card {
+                padding: 20px; /* Less internal padding */
+            }
+
+            /* Typography */
+            h1 { font-size: 1.8em; }
+            .header p { font-size: 0.9em; }
+
+            /* Grid Adjustments */
+            .input-group { margin-bottom: 15px; }
+            
+            /* Force single columns on grids */
+            .card-grid, .info-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Stack buttons on Error/About pages */
+            .action-buttons, .actions {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .btn, button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
     </style>
 </head>
 <body>
