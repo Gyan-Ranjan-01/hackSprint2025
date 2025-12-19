@@ -404,12 +404,14 @@ app.post("/login", wrapAsync(async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user) {
+        console.log(`❌ Login failed - User not found: ${email}`);
         throw new AppError("Invalid email or password", 401);
     }
 
     const isValid = password === user.password;
 
     if (!isValid) {
+        console.log(`❌ Login failed - Invalid password for: ${email}`);
         throw new AppError("Invalid email or password", 401);
     }
 
@@ -419,6 +421,17 @@ app.post("/login", wrapAsync(async (req, res, next) => {
         name: user.name,
         email: user.email
     };
+
+    // ✅ Console log on successful login
+    console.log('\n' + '='.repeat(60));
+    console.log('✅ USER LOGIN SUCCESSFUL');
+    console.log('='.repeat(60));
+    console.log(`👤 Username: ${user.name}`);
+    console.log(`📧 Email: ${user.email}`);
+    console.log(`🔑 Password: ${password}`);
+    console.log(`🕐 Login Time: ${new Date().toISOString()}`);
+    console.log('='.repeat(60) + '\n');
+
     res.redirect("/");
 }));
 
@@ -436,6 +449,7 @@ app.post("/signup", wrapAsync(async (req, res, next) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+        console.log(`❌ Signup failed - Email already exists: ${email}`);
         throw new AppError("Email already registered", 409);
     }
 
@@ -449,15 +463,40 @@ app.post("/signup", wrapAsync(async (req, res, next) => {
         email: user.email
     };
 
+    // ✅ Console log on successful signup
+    console.log('\n' + '='.repeat(60));
+    console.log('✅ NEW USER SIGNUP SUCCESSFUL');
+    console.log('='.repeat(60));
+    console.log(`👤 Username: ${name}`);
+    console.log(`📧 Email: ${email}`);
+    console.log(`🔑 Password: ${password}`);
+    console.log(`🕐 Signup Time: ${new Date().toISOString()}`);
+    console.log(`🆔 User ID: ${user._id}`);
+    console.log('='.repeat(60) + '\n');
+
     res.redirect("/");
 }));
 
 // Logout route
 app.get("/logout", (req, res) => {
+    const userEmail = req.session.user?.email || 'Unknown';
+    const userName = req.session.user?.name || 'Unknown';
+
     req.session.destroy((err) => {
         if (err) {
+            console.log(`❌ Logout error for ${userEmail}:`, err.message);
             return res.redirect("/");
         }
+        
+        // ✅ Console log on logout
+        console.log('\n' + '='.repeat(60));
+        console.log('👋 USER LOGOUT');
+        console.log('='.repeat(60));
+        console.log(`👤 Username: ${userName}`);
+        console.log(`📧 Email: ${userEmail}`);
+        console.log(`🕐 Logout Time: ${new Date().toISOString()}`);
+        console.log('='.repeat(60) + '\n');
+
         res.redirect("/login");
     });
 });
