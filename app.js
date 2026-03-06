@@ -7,12 +7,14 @@ const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const User = require("./models/user.js");
+const Doctor = require("./models/doctor.js");
 const session = require("express-session");
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Groq = require('groq-sdk');
 
-const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/hacksprint";
+// const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/hacksprint";
+const dbUrl = "mongodb://127.0.0.1:27017/hacksprint";
 
 // ==================== MODEL CONFIGURATION ====================
 // Define model fallback order with Groq integration
@@ -371,9 +373,17 @@ main()
     });
 
 // ==================== AUTHENTICATION MIDDLEWARE ====================
-const requireLogin = (req, res, next) => {
+const requireLogin =
+ (req, res, next) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
+    }
+    next();
+};
+
+const requireDoctorLogin = (req, res, next) => {
+    if (!req.session.doctor_id) {
+        return res.redirect('/doctor/login');
     }
     next();
 };
@@ -504,6 +514,151 @@ app.get("/logout", (req, res) => {
 app.get("/help", (req, res) => {
     res.render("help");
 });
+
+// ==================== DOCTOR PORTAL ROUTES ====================
+
+// Doctor Login
+app.get("/doctor/login", (req, res) => {
+    res.render("doctor-login");
+});
+
+app.post("/doctor/login", wrapAsync(async (req, res) => {
+    const { email, password } = req.body;
+    const doctor = await Doctor.findOne({ email });
+    
+    if (!doctor || doctor.password !== password) { // Simple password check for now
+        // console.log('Invalid doctor credentials'); 
+        // In a real app, use flash messages
+        return res.redirect("/doctor/login");
+    }
+
+    req.session.doctor_id = doctor._id;
+    req.session.doctor = doctor;
+    
+    console.log(`✅ Doctor Login: ${doctor.name}`);
+    res.redirect("/doctor/dashboard");
+}));
+
+// Doctor Signup (Temporary/Admin)
+app.get("/doctor/signup", (req, res) => {
+    res.render("doctor-signup");
+});
+
+app.post("/doctor/signup", wrapAsync(async (req, res) => {
+    const { 
+        name, 
+        email, 
+        password, 
+        specialization,
+        phone,
+        years_experience,
+        degrees,
+        medical_college,
+        city,
+        state,
+        available_time 
+    } = req.body;
+    
+    const existing = await Doctor.findOne({ email });
+    if (existing) {
+        return res.redirect("/doctor/login");
+    }
+
+    const doctor = new Doctor({ 
+        name, 
+        email, 
+        password, 
+        specialization,
+        phone,
+        years_experience,
+        degrees,
+        medical_college,
+        city,
+        state,
+        available_time
+    });
+    await doctor.save();
+
+    // Auto-login after signup
+    req.session.doctor_id = doctor._id;
+    req.session.doctor = doctor;
+
+    console.log(`✅ New Doctor Registered & Logged In: ${name}`);
+    res.redirect("/doctor/dashboard");
+}));
+
+// Doctor Dashboard
+app.get("/doctor/dashboard", requireDoctorLogin, wrapAsync(async (req, res) => {
+    const doctor = await Doctor.findById(req.session.doctor_id).populate('appointments.patientId');
+    // console.log(doctor);
+    res.render("doctor-dashboard", { doctor });
+}));
+
+// Doctor Logout
+app.get("/doctor/logout", (req, res) => {
+    req.session.doctor_id = null;
+    req.session.doctor = null;
+    res.redirect("/doctor/login");
+});
+
+// ==================== DOCTOR PROFILE & VERIFICATION ====================
+
+// Update Doctor Profile
+app.put('/api/doctor/profile', requireDoctorLogin, wrapAsync(async (req, res) => {
+    const { name, specialization, degrees, years_experience, medical_college, phone, city, state, available_time } = req.body;
+    
+    const doctor = await Doctor.findByIdAndUpdate(
+        req.session.doctor_id,
+        { name, specialization, degrees, years_experience, medical_college, phone, city, state, available_time },
+        { new: true }
+    );
+    
+    res.json({ success: true, message: 'Profile updated successfully', doctor });
+}));
+
+// Request Verification
+app.post('/api/doctor/request-verification', requireDoctorLogin, wrapAsync(async (req, res) => {
+    const doctor = await Doctor.findByIdAndUpdate(
+        req.session.doctor_id,
+        { verificationRequested: true },
+        { new: true }
+    );
+    
+    console.log(`📩 Verification requested by Dr. ${doctor.name}`);
+    res.json({ success: true, message: 'Verification request submitted' });
+}));
+
+// ==================== SUPER ADMIN ROUTES ====================
+
+// Super Admin Dashboard
+app.get('/superadmin', wrapAsync(async (req, res) => {
+    const doctors = await Doctor.find({});
+    res.render('superadmin', { doctors });
+}));
+
+// Verify Doctor
+app.post('/api/superadmin/verify/:id', wrapAsync(async (req, res) => {
+    const doctor = await Doctor.findByIdAndUpdate(
+        req.params.id,
+        { isVerified: true, verificationRequested: false },
+        { new: true }
+    );
+    
+    console.log(`✅ Doctor verified: ${doctor.name}`);
+    res.json({ success: true, message: 'Doctor verified', doctor });
+}));
+
+// Reject Doctor
+app.post('/api/superadmin/reject/:id', wrapAsync(async (req, res) => {
+    const doctor = await Doctor.findByIdAndUpdate(
+        req.params.id,
+        { verificationRequested: false },
+        { new: true }
+    );
+    
+    console.log(`❌ Doctor verification rejected: ${doctor.name}`);
+    res.json({ success: true, message: 'Verification rejected', doctor });
+}));
 
 // ==================== AI FEATURE PAGE ROUTES ====================
 
@@ -1007,9 +1162,9 @@ app.post("/about", requireLogin, async (req, res) => {
     }
 });
 
-app.get("/consult", requireLogin, (req, res) => {
-    res.render("consult");
-});
+// app.get("/consult", requireLogin, (req, res) => {
+//     res.render("consult");
+// });
 
 app.get("/about", requireLogin, async (req, res) => {
     try {
@@ -1032,6 +1187,98 @@ app.get("/about", requireLogin, async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+// ==================== CONSULTATION ROUTES ====================
+
+app.get('/consult', requireLogin, wrapAsync(async (req, res) => {
+    const doctors = await Doctor.find({});
+    // console.log(doctors);
+    // res.send("consult");
+    res.render('consult', { doctors });
+}));
+
+app.post('/consult/book', requireLogin, wrapAsync(async (req, res) => {
+    const { name, age, gender, contact, problem, symptoms, date, time, bloodGroup, chronicConditions, address } = req.body;
+    
+    // 1. Fetch all doctors
+    const allDoctors = await Doctor.find({});
+    
+    // 2. Filter Logic (Server-side)
+    const text = ((problem || '') + " " + (symptoms || '')).toLowerCase();
+    const keywords = {
+        'Cardiology': ['heart', 'chest', 'pulse', 'pressure', 'hypertension', 'cardiac', 'stroke', 'cholesterol', 'bp'],
+        'Dermatology': ['skin', 'rash', 'itch', 'acne', 'hair', 'lesion', 'eczema', 'psoriasis', 'allergy'],
+        'Neurology': ['headache', 'migraine', 'dizzy', 'brain', 'nerve', 'seizure', 'paralysis', 'numbness'],
+        'Orthopedics': ['bone', 'joint', 'knee', 'back', 'pain', 'fracture', 'muscle', 'spine', 'arthritis', 'ligament'],
+        'Pediatrics': ['child', 'baby', 'infant', 'growth', 'pediatric', 'vaccination'],
+        'General Medicine': ['fever', 'flu', 'cold', 'cough', 'weak', 'fatigue', 'infection', 'viral', 'stomach', 'vomit', 'diarrhea'],
+        'Gynecology': ['period', 'menstrual', 'pregnancy', 'uterus', 'vaginal', 'reproductive', 'fertility'],
+        'Psychiatry': ['mental', 'depression', 'anxiety', 'stress', 'mood', 'sleep', 'insomnia', 'panic']
+    };
+
+    let categories = new Set();
+    for (const [specialty, words] of Object.entries(keywords)) {
+        if (words.some(w => text.includes(w))) {
+            categories.add(specialty);
+        }
+    }
+    
+    let recommended = [];
+    if (categories.size > 0) {
+        // loose matching for specialization string
+        recommended = allDoctors.filter(doc => {
+            const docSpec = (doc.specialization || doc.specialty || '').toLowerCase();
+            return Array.from(categories).some(cat => docSpec.includes(cat.toLowerCase()));
+        });
+    }
+    
+    // Pass data to view
+    res.render('consult-book', {
+        patient: { name, age, gender, contact, problem, symptoms, date, time, bloodGroup, chronicConditions, address },
+        doctors: allDoctors,
+        recommended: recommended
+    });
+}));
+// app.post('/consult', requireLogin, wrapAsync(async (req, res) => {
+    
+// }));
+
+// Locate this section in your app.js (approx line 865)
+app.post('/api/consult/book', requireLogin, wrapAsync(async (req, res) => {
+    // 1. Add 'time' to the destructured variables
+    const { name, doctorId, date, time, reason, age, gender, contact, symptoms, bloodGroup, chronicConditions, address } = req.body;
+    const patientName = name;
+
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+        throw new AppError('Doctor not found', 404);
+    }
+
+    // 2. Combine Date and Time strings
+    // Format: "YYYY-MM-DD" + "T" + "HH:MM" -> "2025-12-29T14:30"
+    const combinedDateTime = new Date(`${date}T${time}`);
+
+    doctor.appointments.push({
+        patientId: req.session.user_id,
+        patientName,
+        age,
+        gender,
+        contact,
+        symptoms,
+        bloodGroup,
+        chronicConditions,
+        address,
+        // 3. Save the combined datetime object
+        date: combinedDateTime, 
+        reason,
+        status: 'Pending'
+    });
+
+    await doctor.save();
+    console.log(`✅ Appointment booked for ${doctor.name} by ${patientName} at ${time}`);
+    
+    res.json({ success: true, message: 'Appointment booked successfully', doctorName: doctor.name });
+}));
 
 // ==================== ERROR HANDLERS ====================
 

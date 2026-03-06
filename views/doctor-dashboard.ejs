@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocOnCall - Doctor Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Base Variables and Reset */
+        :root {
+            --primary-blue: #5B7FFF;
+            --primary-purple: #7C5FFF;
+            --dark-bg: #0A0E1A;
+            --card-bg: #141824;
+            --card-hover: #1A1F2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A8C1;
+            --success-green: #4ADE80;
+            --error-red: #EF4444;
+            --warning-yellow: #FCD34D;
+            --border-color: #1F2937;
+            --glow-blue: rgba(91, 127, 255, 0.3);
+            --glow-green: rgba(74, 222, 128, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #1d1f24 0%, #1a1f35 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Layout & Navigation */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: rgba(20, 24, 36, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .doctor-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px 8px 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Appointments Section */
+        .appointments-section {
+            background: rgba(20, 24, 36, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+
+        /* Patient Card */
+        .patient-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .patient-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .patient-avatar-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .patient-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .patient-details p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .patient-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .time-badge {
+            padding: 8px 16px;
+            background: rgba(91, 127, 255, 0.15);
+            border: 1px solid var(--primary-blue);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .patient-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: var(--card-hover);
+            border-color: var(--primary-blue);
+        }
+
+        .action-button.start-call {
+            background: linear-gradient(135deg, var(--success-green), #22C55E);
+            border: none;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 26, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .close-button {
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Form Grid */
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .form-field {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .form-field label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .patient-meta {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Two-column layout for Past and Future */
+        .appointments-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .appointments-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sub-section {
+            background: rgba(20, 24, 36, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .sub-section-header {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-section-header.past {
+            color: #F59E0B;
+        }
+
+        .sub-section-header.future {
+            color: #4ADE80;
+        }
+
+        /* Verification Badge */
+        .verify-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .verify-badge.verified {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+
+        .verify-badge.unverified {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid #f87171;
+        }
+
+        /* Profile Background */
+        .doctor-profile.profile-verified {
+            background: rgba(74, 222, 128, 0.15) !important;
+            border-color: rgba(74, 222, 128, 0.3) !important;
+        }
+
+        .doctor-profile.profile-unverified {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: rgba(239, 68, 68, 0.2) !important;
+        }
+
+        /* Profile Edit Styles */
+        .profile-input {
+            width: 100%;
+            padding: 10px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .profile-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-profile {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-save {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-request {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+        }
+
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .verification-alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error-red);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: var(--error-red);
+        }
+
+        .verification-success {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo-section">
+                <div class="logo">D</div>
+                <div class="logo-text">
+                    <h1>DocOnCall</h1>
+                    <p>Doctor Portal</p>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <div class="doctor-profile <% if(doctor.isVerified) { %>profile-verified<% } else { %>profile-unverified<% } %>"
+                    onclick="openDoctorProfile()">
+                    <div class="doctor-avatar">
+                        <%= doctor.name.charAt(0).toUpperCase() %>
+                    </div>
+                    <div class="doctor-info">
+                        <h3>Dr. <%= doctor.name %>
+                                <% if(doctor.isVerified) { %>
+                                    <span class="verify-badge verified">✓ Verified</span>
+                                    <% } else { %>
+                                        <span class="verify-badge unverified">Not Verified</span>
+                                        <% } %>
+                        </h3>
+                        <p>
+                            <%= doctor.specialization %>
+                        </p>
+                    </div>
+                </div>
+                <!-- Logout added back -->
+                <a href="/doctor/logout" style="color:white; text-decoration:none; margin-left:10px;">Logout</a>
+            </div>
+        </nav>
+
+        <!-- Today's Appointments Section (Full Width) -->
+        <div class="appointments-section">
+            <h2 class="section-header">📅 Today's Appointments</h2>
+            <div id="todayContainer"></div>
+        </div>
+
+        <!-- Past and Future Grid -->
+        <div class="appointments-grid">
+            <!-- Past Appointments -->
+            <div class="sub-section">
+                <h3 class="sub-section-header past">⏪ Past Appointments</h3>
+                <div id="pastContainer"></div>
+            </div>
+
+            <!-- Future Appointments -->
+            <div class="sub-section">
+                <h3 class="sub-section-header future">⏩ Upcoming Appointments</h3>
+                <div id="futureContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Form Modal -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Patient Information</h2>
+                <div class="close-button" onclick="closeModal('formModal')">×</div>
+            </div>
+            <div id="formContent"></div>
+        </div>
+    </div>
+
+    <!-- Prescription Modal -->
+    <div id="prescriptionModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>Write Prescription</h2>
+                <div class="close-button" onclick="closeModal('prescriptionModal')">×</div>
+            </div>
+            <div id="prescriptionContent"></div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Send Message</h2>
+                <div class="close-button" onclick="closeModal('messageModal')">×</div>
+            </div>
+            <div id="messageContent"></div>
+        </div>
+    </div>
+
+    <!-- Doctor Profile Modal -->
+    <div id="doctorProfileModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Doctor Profile</h2>
+                <div class="close-button" onclick="closeModal('doctorProfileModal')">×</div>
+            </div>
+            <div id="profileContent"></div>
+        </div>
+    </div>
+
+    <!-- Safe Data Injection -->
+    <script id="server-data-appointments" type="application/json">
+        <%- JSON.stringify(doctor.appointments) %>
+    </script>
+    <script id="server-data-doctor" type="application/json">
+        <%- JSON.stringify(doctor) %>
+    </script>
+
+    <script>
+        // Load Data
+        let rawAppointments = [];
+        try {
+            const rawText = document.getElementById('server-data-appointments').textContent;
+            rawAppointments = JSON.parse(rawText);
+        } catch (e) { console.error("Data Load Error", e); }
+
+        // Transform Data for UI
+        const patients = rawAppointments.map((app, i) => {
+            const p = app.patientId || {};
+            // Generate pseudo-random gradient based on index
+            const apptDate = new Date(app.date);
+            const colors = [
+                "linear-gradient(135deg, #FF6B9D, #C651FF)",
+                "linear-gradient(135deg, #4ADE80, #22C55E)",
+                "linear-gradient(135deg, #FCD34D, #F59E0B)",
+                "linear-gradient(135deg, #8B5CF6, #6366F1)",
+                "linear-gradient(135deg, #EF4444, #DC2626)"
+            ];
+
+            return {
+                id: i,
+                name: app.patientName || p.name || 'Unknown',
+                initial: (p.name || app.patientName || 'U').charAt(0).toUpperCase(),
+                condition: app.reason || 'General Consultation',
+
+                time: apptDate.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }),
+                date: apptDate.toLocaleDateString(),
+                rawDate: apptDate, // Keep the raw Date object for comparison
+                avatar: colors[i % colors.length],
+                formData: {
+                    personalInfo: {
+                        name: p.name || app.patientName || '--',
+                        // Prefer appointment data (from form) over profile data
+                        age: app.age || p.age || '--',
+                        gender: app.gender || p.gender || '--',
+                        email: p.email || '--',
+                        address: p.address || '--',
+                        contact: app.contact || p.phone || 'N/A'
+                    },
+                    medicalHistory: {
+                        bloodGroup: p.bloodGroup || '--',
+                        chronicConditions: p.critical || 'None listed',
+                        allergies: "See Profile",
+                        currentMedications: "See Profile"
+                    },
+                    currentIssue: {
+                        chiefComplaint: app.reason || '--',
+                        symptoms: app.symptoms || '--',
+                        duration: '--',
+                        severity: app.status || 'Pending',
+                        previousTreatment: '--'
+                    }
+                }
+            };
+        });
+
+        const consultationStatus = {};
+        patients.forEach(p => {
+            consultationStatus[p.id] = { formViewed: false, meetingStarted: false };
+        });
+
+        // Date comparison helpers
+        function isToday(d) {
+            const today = new Date();
+            return d.getFullYear() === today.getFullYear() &&
+                d.getMonth() === today.getMonth() &&
+                d.getDate() === today.getDate();
+        }
+
+        function isPast(d) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return d < today;
+        }
+
+        function isFuture(d) {
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            return d > today;
+        }
+
+        function renderPatientCard(p, appointmentType) {
+            // appointmentType: 'today', 'past', or 'future'
+            const isTodayAppt = appointmentType === 'today';
+
+            // Conditional button: Start Call for today, Message for past/future
+            const actionButton = isTodayAppt
+                ? `<button class="action-button start-call" onclick="startMeeting(${p.id})">🎥 Start Call</button>`
+                : `<button class="action-button" onclick="openMessage(${p.id})" style="background: var(--card-bg); color: var(--success-green); border-color: var(--success-green);">💬 Message</button>`;
+
+            return `
+                <div class="patient-card">
+                    <div class="patient-header">
+                        <div class="patient-info">
+                            <div class="patient-avatar-img" style="background: ${p.avatar}">
+                                ${p.initial}
+                            </div>
+                            <div class="patient-details">
+                                <h3>${p.name}</h3>
+                                <p>${p.condition}</p>
+                            </div>
+                        </div>
+                        <div class="patient-meta">
+                            <div class="time-badge">${p.time}, ${p.date}</div>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="action-button" onclick="viewForm(${p.id})">📋 View Info</button>
+                        <button class="action-button" onclick="openPrescription(${p.id})" style="background: var(--card-bg); color: var(--primary-purple); border-color: var(--primary-purple);">📝 Prescribe</button>
+                        ${actionButton}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPatients() {
+            const todayContainer = document.getElementById('todayContainer');
+            const pastContainer = document.getElementById('pastContainer');
+            const futureContainer = document.getElementById('futureContainer');
+
+            const todayPatients = patients.filter(p => isToday(p.rawDate));
+            const pastPatients = patients.filter(p => isPast(p.rawDate));
+            const futurePatients = patients.filter(p => isFuture(p.rawDate));
+
+            // Today's
+            if (todayPatients.length === 0) {
+                todayContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);">No appointments scheduled for today.</div>';
+            } else {
+                todayContainer.innerHTML = todayPatients.map(p => renderPatientCard(p, 'today')).join('');
+            }
+
+            // Past
+            if (pastPatients.length === 0) {
+                pastContainer.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-secondary);">No past appointments.</div>';
+            } else {
+                pastContainer.innerHTML = pastPatients.map(p => renderPatientCard(p, 'past')).join('');
+            }
+
+            // Future
+            if (futurePatients.length === 0) {
+                futureContainer.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-secondary);">No upcoming appointments.</div>';
+            } else {
+                futureContainer.innerHTML = futurePatients.map(p => renderPatientCard(p, 'future')).join('');
+            }
+        }
+
+        function viewForm(id) {
+            const p = patients.find(pat => pat.id === id);
+            if (!p) return;
+            const d = p.formData;
+
+            const html = `
+        <div class="form-section">
+            <h3>Personal Info</h3>
+            <div class="form-row">
+                <div class="form-field"><label>Name</label><div class="value">${d.personalInfo.name}</div></div>
+                <div class="form-field"><label>Age</label><div class="value">${d.personalInfo.age}</div></div>
+                <div class="form-field"><label>Gender</label><div class="value">${d.personalInfo.gender}</div></div>
+                <div class="form-field"><label>Contact</label><div class="value">${d.personalInfo.contact || d.personalInfo.phone}</div></div>
+            </div>
+            <div class="form-field"><label>Address</label><div class="value">${d.personalInfo.address}</div></div>
+        </div>
+        <div class="form-section">
+            <h3>Medical Profile</h3>
+            <div class="form-row">
+                <div class="form-field"><label>Blood Group</label><div class="value">${d.medicalHistory.bloodGroup}</div></div>
+                <div class="form-field"><label>Chronic Conditions</label><div class="value">${d.medicalHistory.chronicConditions}</div></div>
+            </div>
+        </div>
+        <div class="form-section">
+            <h3>Current Issue (From Form)</h3>
+            <div class="form-field"><label>Problem</label><div class="value" style="font-weight:bold; color:var(--primary-blue);">${d.currentIssue.chiefComplaint}</div></div>
+            <div class="form-field" style="margin-top:10px;"><label>Detailed Symptoms</label><div class="value">${d.currentIssue.symptoms || '--'}</div></div>
+        </div>
+    `;
+            document.getElementById('formContent').innerHTML = html;
+            document.getElementById('formModal').classList.add('active');
+            consultationStatus[id].formViewed = true;
+        }
+
+        function openPrescription(id) {
+            const p = patients.find(pat => pat.id === id);
+            const currentDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const html = `
+        <div style="background:white; color:black; padding:30px; border-radius:10px;">
+            <div style="border-bottom:2px solid #eee; padding-bottom:20px; margin-bottom:20px;">
+                <h2 style="color:#333; margin-bottom:10px;">DocOnCall Prescription</h2>
+                <div style="display:flex; justify-content:space-between; font-size:14px; color:#666;">
+                    <div>Doctor: Dr. <%= doctor.name %></div>
+                    <div>Date: ${currentDate}</div>
+                </div>
+                <div style="margin-top:10px; font-weight:bold;">Patient: ${p.name}</div>
+            </div>
+            <textarea id="prescriptionText" style="width:100%; height:300px; padding:15px; border:2px solid #eee; border-radius:10px; resize:vertical; font-family:inherit;"
+                placeholder="Rx\n\nDiagnosis:\n\nMedications:\n\nInstructions:"></textarea>
+            <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+                <button onclick="savePrescription(${p.id})" style="background:#5B7FFF; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer;">💾 Save Prescription</button>
+            </div>
+        </div>
+    `;
+            document.getElementById('prescriptionContent').innerHTML = html;
+            document.getElementById('prescriptionModal').classList.add('active');
+        }
+
+        function savePrescription(id) {
+            const text = document.getElementById('prescriptionText').value;
+            if (!text.trim()) { alert("Please write a prescription."); return; }
+            // In a real app, send to backend here
+            alert("✅ Prescription Saved!");
+            document.getElementById('prescriptionModal').classList.remove('active');
+        }
+
+
+        function startMeeting(id) {
+            const p = patients.find(pat => pat.id === id);
+            if (confirm('Start video consultation with ' + p.name + '?')) {
+                // Use a dynamic meeting link (demo)
+                window.open('https://meet.google.com/new', '_blank');
+                consultationStatus[id].meetingStarted = true;
+            }
+        }
+
+        function openMessage(id) {
+            const p = patients.find(pat => pat.id === id);
+            if (!p) return;
+
+            const html = `
+        <div style="background:var(--dark-bg); padding:25px; border-radius:10px;">
+            <div style="margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border-color);">
+                <div style="font-size:16px; color:var(--text-secondary);">Sending message to:</div>
+                <div style="font-size:20px; font-weight:bold; color:var(--text-primary); margin-top:5px;">${p.name}</div>
+            </div>
+            <textarea id="messageText" style="width:100%; height:120px; padding:15px; background:var(--card-bg); border:1px solid var(--border-color); border-radius:10px; resize:vertical; font-family:inherit; color:var(--text-primary);"
+                placeholder="Type a message to the patient..."></textarea>
+            <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+                <button onclick="sendMessage(${p.id})" style="background:var(--success-green); color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:600;">📤 Send Message</button>
+            </div>
+        </div>
+    `;
+            document.getElementById('messageContent').innerHTML = html;
+            document.getElementById('messageModal').classList.add('active');
+        }
+
+        function sendMessage(id) {
+            const text = document.getElementById('messageText').value;
+            if (!text.trim()) {
+                alert("Please write a message.");
+                return;
+            }
+            // Frontend only - no backend integration
+            document.getElementById('messageModal').classList.remove('active');
+            alert("✅ Message sent");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ==================== DOCTOR PROFILE MANAGEMENT ====================
+
+        let doctorData = {};
+        try {
+            doctorData = JSON.parse(document.getElementById('server-data-doctor').textContent);
+        } catch (e) { console.error('Failed to load doctor data', e); }
+
+        let isEditMode = false;
+
+        function getVerificationBadge() {
+            if (doctorData.isVerified) {
+                return '<span class=\"verify-badge verified\">✓ Verified</span>';
+            }
+            return '<span class=\"verify-badge unverified\">Not Verified</span>';
+        }
+
+        function getVerificationSection() {
+            if (doctorData.isVerified) {
+                return `<div class="verification-alert verification-success">✅ Your account is verified.</div>`;
+            }
+
+            if (doctorData.verificationRequested) {
+                return `
+                    <div class="verification-alert" style="background: rgba(252, 211, 77, 0.1); border-color: #F59E0B; color: #F59E0B;">
+                        ⏳ Verification request pending. Super Admin will review it soon.
+                    </div>
+                    <button class="btn-profile btn-request btn-disabled" disabled title="Super Admin will review it soon">
+                        📩 Contact Super Admin
+                    </button>
+                `;
+            }
+
+            return `
+                <div class="verification-alert">
+                    ⚠️ Your account is not verified. Please submit your degree for verification.
+                </div>
+                <button class="btn-profile btn-request" onclick="requestVerification()">
+                    📩 Contact Super Admin
+                </button>
+            `;
+        }
+
+        function renderProfileView() {
+            const d = doctorData;
+            return `
+                ${getVerificationSection()}
+                <div style="display: flex; align-items: center; gap: 20px; margin: 20px 0;">
+                    <div class="doctor-avatar" style="width: 80px; height: 80px; font-size: 32px;">
+                        ${d.name ? d.name.charAt(0).toUpperCase() : 'D'}
+                    </div>
+                    <div>
+                        <h2>Dr. ${d.name || ''} ${getVerificationBadge()}</h2>
+                        <p style="color: var(--primary-blue);">${d.specialization || ''}</p>
+                        <p style="color: var(--text-secondary);">${d.email || ''}</p>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Degrees</label><div class="value">${d.degrees || '--'}</div></div>
+                    <div class="form-field"><label>Experience</label><div class="value">${d.years_experience || '--'} Years</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Medical College</label><div class="value">${d.medical_college || '--'}</div></div>
+                    <div class="form-field"><label>Phone</label><div class="value">${d.phone || '--'}</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Location</label><div class="value">${d.city || ''} ${d.state || ''}</div></div>
+                    <div class="form-field"><label>Available Time</label><div class="value">${d.available_time || '--'}</div></div>
+                </div>
+                <div style="margin-top: 25px; text-align: right;">
+                    <button class="btn-profile btn-edit" onclick="toggleEditMode()">✏️ Edit Profile</button>
+                </div>
+            `;
+        }
+
+        function renderProfileEdit() {
+            const d = doctorData;
+            return `
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                    <div class="doctor-avatar" style="width: 60px; height: 60px; font-size: 24px;">
+                        ${d.name ? d.name.charAt(0).toUpperCase() : 'D'}
+                    </div>
+                    <div><h3>Edit Profile</h3></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Name</label><input class="profile-input" id="edit-name" value="${d.name || ''}"></div>
+                    <div class="form-field"><label>Specialization</label><input class="profile-input" id="edit-specialization" value="${d.specialization || ''}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Degrees</label><input class="profile-input" id="edit-degrees" value="${d.degrees || ''}"></div>
+                    <div class="form-field"><label>Experience (Years)</label><input class="profile-input" type="number" id="edit-experience" value="${d.years_experience || ''}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Medical College</label><input class="profile-input" id="edit-college" value="${d.medical_college || ''}"></div>
+                    <div class="form-field"><label>Phone</label><input class="profile-input" id="edit-phone" value="${d.phone || ''}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>City</label><input class="profile-input" id="edit-city" value="${d.city || ''}"></div>
+                    <div class="form-field"><label>State</label><input class="profile-input" id="edit-state" value="${d.state || ''}"></div>
+                </div>
+                <div class="form-field"><label>Available Time</label><input class="profile-input" id="edit-time" value="${d.available_time || ''}"></div>
+                <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <button class="btn-profile btn-cancel" onclick="toggleEditMode()">Cancel</button>
+                    <button class="btn-profile btn-save" onclick="saveProfile()">💾 Save Changes</button>
+                </div>
+            `;
+        }
+
+        function openDoctorProfile() {
+            isEditMode = false;
+            document.getElementById('profileContent').innerHTML = renderProfileView();
+            document.getElementById('doctorProfileModal').classList.add('active');
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.getElementById('profileContent').innerHTML = isEditMode ? renderProfileEdit() : renderProfileView();
+        }
+
+        async function saveProfile() {
+            const payload = {
+                name: document.getElementById('edit-name').value,
+                specialization: document.getElementById('edit-specialization').value,
+                degrees: document.getElementById('edit-degrees').value,
+                years_experience: document.getElementById('edit-experience').value,
+                medical_college: document.getElementById('edit-college').value,
+                phone: document.getElementById('edit-phone').value,
+                city: document.getElementById('edit-city').value,
+                state: document.getElementById('edit-state').value,
+                available_time: document.getElementById('edit-time').value
+            };
+
+            try {
+                const res = await fetch('/api/doctor/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    Object.assign(doctorData, data.doctor);
+                    alert('✅ Profile updated successfully!');
+                    location.reload(); // Reload to reflect changes in navbar
+                } else {
+                    alert('❌ Failed to update profile');
+                }
+            } catch (e) {
+                alert('❌ Network error');
+                console.error(e);
+            }
+        }
+
+        async function requestVerification() {
+            try {
+                const res = await fetch('/api/doctor/request-verification', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    doctorData.verificationRequested = true;
+                    alert('✅ Your verification request has been submitted.');
+                    document.getElementById('profileContent').innerHTML = renderProfileView();
+                }
+            } catch (e) {
+                alert('❌ Failed to submit request');
+                console.error(e);
+            }
+        }
+
+        window.onclick = function (e) {
+            if (e.target.classList.contains('modal')) e.target.classList.remove('active');
+        }
+
+        // Init
+        renderPatients();
+    </script>
+</body>
+
+</html>

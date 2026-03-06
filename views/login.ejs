@@ -1,305 +1,443 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      max-width: 900px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
       }
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
+    }
 
+    .left-panel {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 60px 40px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .left-panel h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .left-panel p {
+      font-size: 1.1em;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .form-panel {
+      padding: 60px 40px;
+    }
+
+    .form-panel h2 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.8em;
+    }
+
+    .form-panel .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-weight: 400;
+      font-size: 0.9em;
+    }
+
+    .forgot-password {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 25px 0;
+      color: #999;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .social-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .social-btn {
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .social-btn:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .signup-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Toggle Styles - Global */
+    .toggle-container {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      background: #f0f0f0;
+      border-radius: 25px;
+      display: flex;
+      margin-bottom: 30px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 2px;
+      left: 0;
+      width: 50%;
+      height: 46px;
+      background: white;
+      border-radius: 23px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .toggle-option {
+      flex: 1;
+      border: none;
+      background: transparent;
+      z-index: 2;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      color: #666;
+      transition: color 0.3s;
+    }
+
+    .toggle-option.active {
+      color: #333;
+      /* Default active color */
+    }
+
+    @media (max-width: 768px) {
       .container {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-        max-width: 900px;
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        animation: slideUp 0.6s ease-out;
-      }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        grid-template-columns: 1fr;
+        /* Single column */
+        height: auto;
+        margin-top: 20px;
+        /* Add breathing room */
       }
 
       .left-panel {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 60px 40px;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .left-panel h1 {
-        font-size: 2.5em;
-        margin-bottom: 20px;
-        font-weight: 700;
-      }
-
-      .left-panel p {
-        font-size: 1.1em;
-        opacity: 0.9;
-        line-height: 1.6;
+        display: none;
+        /* Hide the decorative side entirely on mobile */
       }
 
       .form-panel {
-        padding: 60px 40px;
+        padding: 70px 20px 30px 20px;
+        /* Increase top padding for back button */
       }
 
-      .form-panel h2 {
-        color: #333;
-        margin-bottom: 10px;
-        font-size: 1.8em;
+      /* Adjust font sizes */
+      h2 {
+        font-size: 1.5em;
       }
 
-      .form-panel .subtitle {
-        color: #666;
-        margin-bottom: 30px;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: block;
-        color: #333;
-        font-weight: 500;
-        margin-bottom: 8px;
-        font-size: 0.9em;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1em;
-        transition: all 0.3s;
-        outline: none;
-      }
-
-      input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      }
 
       .form-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-      }
-
-      .checkbox-group {
-        display: flex;
-        align-items: center;
-      }
-
-      .checkbox-group input[type="checkbox"] {
-        width: auto;
-        margin-right: 8px;
-      }
-
-      .checkbox-group label {
-        margin: 0;
-        font-weight: 400;
-        font-size: 0.9em;
-      }
-
-      .forgot-password {
-        color: #667eea;
-        text-decoration: none;
-        font-size: 0.9em;
-        font-weight: 500;
-      }
-
-      .forgot-password:hover {
-        text-decoration: underline;
-      }
-
-      button {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-      }
-
-      button:active {
-        transform: translateY(0);
-      }
-
-      .divider {
-        text-align: center;
-        margin: 25px 0;
-        color: #999;
-        position: relative;
-      }
-
-      .divider::before,
-      .divider::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        width: 40%;
-        height: 1px;
-        background: #e0e0e0;
-      }
-
-      .divider::before {
-        left: 0;
-      }
-
-      .divider::after {
-        right: 0;
-      }
-
-      .social-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        flex-direction: column;
+        align-items: flex-start;
         gap: 10px;
-        margin-bottom: 20px;
       }
 
-      .social-btn {
-        padding: 12px;
-        border: 2px solid #e0e0e0;
-        background: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 500;
-      }
+      /* Specific color for User active state handled in JS or via specific class if needed,
+           but generally text color change is enough.
+           Could add specific colors for the slider background in JS. */
+    }
 
-      .social-btn:hover {
-        border-color: #667eea;
-        background: #f8f9ff;
-      }
+    .form-options {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  </style>
+</head>
 
-      .signup-link {
-        text-align: center;
-        margin-top: 20px;
-        color: #666;
-      }
-
-      .signup-link a {
-        color: #667eea;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      .signup-link a:hover {
-        text-decoration: underline;
-      }
-
-      @media (max-width: 768px) {
-        .container {
-          grid-template-columns: 1fr; /* Single column */
-          height: auto;
-          margin-top: 20px; /* Add breathing room */
-        }
-
-        .left-panel {
-          display: none; /* Hide the decorative side entirely on mobile */
-        }
-
-        .form-panel {
-          padding: 30px 20px; /* Reduce padding */
-        }
-        
-        /* Adjust font sizes */
-        h2 { font-size: 1.5em; }
-        .form-options { flex-direction: column; align-items: flex-start; gap: 10px; }
-      }
-
-        .form-options {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-        }
-      
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="left-panel">
-        <h1>Welcome Back!</h1>
-        <p>
-          Login to access your account and continue where you left off. We're
-          excited to see you again!
-        </p>
-      </div>
-
-      <div class="form-panel">
-        <h2>Login</h2>
-        <p class="subtitle">Enter your credentials to access your account</p>
-
-        <form method="post" id="loginForm" action="/login">
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" name="email" id="email" required />
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" required />
-          </div>
-
-          <div class="form-options">
-            <div class="checkbox-group">
-              <input type="checkbox" id="remember" />
-              <label for="remember">Remember me</label>
-            </div>
-          </div>
-
-          <button type="submit">Login</button>
-        </form>
-
-        <div class="signup-link">
-          Don't have an account? <a href="/signup">Sign up</a>
-        </div>
-      </div>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <h1>Welcome Back!</h1>
+      <p>
+        Login to access your account and continue where you left off. We're
+        excited to see you again!
+      </p>
     </div>
 
-    
-  </body>
+    <div class="form-panel" style="position: relative;">
+      <a href="/" class="back-btn-top" title="Back to Home">←</a>
+      <style>
+        .back-btn-top {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          text-decoration: none;
+          color: #999;
+          font-size: 1.5rem;
+          font-weight: bold;
+          transition: all 0.3s;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          z-index: 100;
+        }
+
+        .back-btn-top:hover {
+          background: #f5f5f5;
+          color: #333;
+        }
+      </style>
+      <div class="toggle-container">
+        <div class="toggle-btn" id="toggleBtn"></div>
+        <button class="toggle-option active" onclick="setLoginType('user')">User</button>
+        <button class="toggle-option" onclick="setLoginType('doctor')">Doctor</button>
+      </div>
+
+      <h2 id="formTitle">User Login</h2>
+      <p class="subtitle" id="formSubtitle">Enter your credentials to access your account</p>
+
+      <form method="post" id="loginForm" action="/login">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" name="email" id="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" required />
+        </div>
+
+        <div class="form-options">
+          <div class="checkbox-group">
+            <input type="checkbox" id="remember" />
+            <label for="remember">Remember me</label>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn">Login as User</button>
+      </form>
+
+      <div class="signup-link" id="signupLinkContainer">
+        Don't have an account? <a href="/signup" id="signupLink">Sign up</a>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="text-align: center; margin-top: 15px;">
+        <!-- Back button moved to top -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setLoginType(type) {
+      const form = document.getElementById('loginForm');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const options = document.querySelectorAll('.toggle-option');
+      const title = document.getElementById('formTitle');
+      const submitBtn = document.getElementById('submitBtn');
+      const signupLink = document.getElementById('signupLink');
+      const signupContainer = document.getElementById('signupLinkContainer');
+
+      if (type === 'user') {
+        form.action = '/login';
+        toggleBtn.style.left = '0';
+        options[0].classList.add('active');
+        options[1].classList.remove('active');
+        title.textContent = 'User Login';
+        title.style.color = '#333';
+        submitBtn.textContent = 'Login as User';
+        submitBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        signupLink.href = '/signup';
+        signupLink.innerText = 'Sign up';
+        signupContainer.style.display = 'block';
+      } else {
+        form.action = '/doctor/login';
+        toggleBtn.style.left = '50%';
+        options[0].classList.remove('active');
+        options[1].classList.add('active');
+        title.textContent = 'Doctor Login';
+        title.style.color = '#2c3e50'; // Darker color for doctor
+        submitBtn.textContent = 'Login as Doctor';
+        submitBtn.style.background = 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)'; // Different color for doctor
+        signupLink.href = '/doctor/signup';
+        signupLink.innerText = 'Join as Doctor';
+        // Optional: Hide signup for doctors if you want only admin to add them, 
+        // generally doctors also sign up. Keeping it visible.
+        signupContainer.style.display = 'block';
+      }
+    }
+  </script>
+
+
+</body>
+
 </html>

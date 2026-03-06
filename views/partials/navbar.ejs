@@ -1,0 +1,82 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🏥</div>
+            <h2>DocOnCall</h2>
+        </div>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="/chatbot" class="feature-card"><span class="menu-icon">💬</span> AI Health Chatbot</a> </li>
+        <li><a href="/symptom-analysis" class="feature-card"><span class="menu-icon">📅</span> Symptoms Analysis</a>
+        </li>
+        <li><a href="/report-summary" class="feature-card"><span class="menu-icon">📋</span> Report Summary</a></li>
+        <li><a href="/medicine-info" class="feature-card"><span class="menu-icon">💊</span> Medicine Information</a>
+        </li>
+        <li><a href="/medicine-info" class="feature-card"><span class="menu-icon">💬</span> Health Tips</a></li>
+        <li><a href="/diet-plan" class="feature-card"><span class="menu-icon">🏃</span> Diet Plan Generator</a></li>
+        <!--<li><a href="#"><span class="menu-icon">💳</span> Billing</a></li>
+        <li><a href="#"><span class="menu-icon">⚙️</span> Settings</a></li>
+        <li><a href="#"><span class="menu-icon">❓</span> Help & Support</a></li>-->
+    </ul>
+</aside>
+
+<!-- Sidebar Toggle -->
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainWrapper = document.getElementById('mainWrapper');
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('visible');
+                sidebarToggle.classList.toggle('hidden');
+                if (mainWrapper) mainWrapper.classList.toggle('expanded');
+
+                // Change icon based on state
+                if (sidebar.classList.contains('hidden')) {
+                    sidebarToggle.textContent = '☰';
+                } else {
+                    sidebarToggle.textContent = '✕';
+                }
+            });
+        }
+
+        // Initialize sidebar state on mobile
+        if (window.innerWidth <= 1024) {
+            if (sidebar) sidebar.classList.add('hidden');
+            if (sidebarToggle) sidebarToggle.classList.add('hidden');
+            if (mainWrapper) mainWrapper.classList.add('expanded');
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 1024) {
+                if (sidebar) sidebar.classList.add('hidden');
+                if (mainWrapper) mainWrapper.classList.add('expanded');
+            } else {
+                if (sidebar) {
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.remove('visible');
+                }
+                if (sidebarToggle) {
+                    sidebarToggle.classList.remove('hidden');
+                    sidebarToggle.textContent = '☰';
+                }
+                if (mainWrapper) mainWrapper.classList.remove('expanded');
+            }
+        });
+
+        // Add active state to sidebar menu
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                // e.preventDefault();
+                document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+</script>

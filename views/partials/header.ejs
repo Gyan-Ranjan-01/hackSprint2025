@@ -1,0 +1,135 @@
+<header>
+    <div class="header-left">
+        <h1>Welcome Back, <%= currentUser.name %>! 👋</h1>
+        <div class="breadcrumb">Dashboard / Overview</div>
+    </div>
+    <div class="header-right">
+        <!-- Notification Icon with Dropdown -->
+        <div class="notification-wrapper">
+            <div class="notification-icon">
+                🔔
+                <span class="notification-badge">5</span>
+            </div>
+            <div class="notification-panel">
+                <div class="notification-header">
+                    <h3>Notifications</h3>
+                    <span class="mark-read">Mark all read</span>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item unread">
+                        <div class="notification-item-icon notif-icon-blue">
+                            📅
+                        </div>
+                        <div class="notification-content">
+                            <h4>Appointment Reminder</h4>
+                            <p>Dr. Sarah Johnson - Tomorrow at 10:00 AM</p>
+                            <span class="notification-time">2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item unread">
+                        <div class="notification-item-icon notif-icon-green">
+                            ✅
+                        </div>
+                        <div class="notification-content">
+                            <h4>Lab Results Ready</h4>
+                            <p>Your blood test results are now available</p>
+                            <span class="notification-time">5 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item unread">
+                        <div class="notification-item-icon notif-icon-orange">
+                            💊
+                        </div>
+                        <div class="notification-content">
+                            <h4>Medication Reminder</h4>
+                            <p>Time to take your evening medication</p>
+                            <span class="notification-time">1 day ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-item-icon notif-icon-blue">
+                            💬
+                        </div>
+                        <div class="notification-content">
+                            <h4>New Message</h4>
+                            <p>Dr. Chen replied to your consultation</p>
+                            <span class="notification-time">2 days ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-item-icon notif-icon-green">
+                            📋
+                        </div>
+                        <div class="notification-content">
+                            <h4>Prescription Renewed</h4>
+                            <p>Your Vitamin D3 prescription has been renewed</p>
+                            <span class="notification-time">3 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Menu -->
+        <div class="user-menu-wrapper">
+            <div class="user-info">
+                <div class="welcome">
+                    <div class="welcome-name">
+                        <%= currentUser.name %>
+                    </div>
+                    <div class="welcome-text hide-on-mobile">Patient ID: <%= currentUser.id %>
+                    </div>
+                </div>
+                <div class="avatar">
+                    <%= currentUser.name.charAt(0).toUpperCase() %>
+                </div>
+            </div>
+            <div class="user-dropdown">
+                <a href="/about" style="text-decoration: none;">
+                    <div class="user-dropdown-item">
+                        <span>👤</span> My Profile
+                    </div>
+                </a>
+                <!-- <div class="user-dropdown-item">
+                    <span>⚙️</span> Settings
+                </div>
+                <div class="user-dropdown-item">
+                    <span>💳</span> Billing
+                </div> -->
+                <a href="/help" style="text-decoration: none;">
+                    <div class="user-dropdown-item">
+                        <span>❓</span> Help
+                    </div>
+                </a>
+                <a href="/logout" style="text-decoration: none;">
+                    <div class="user-dropdown-item">
+                        <span>🚪</span> Logout
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mark notification as read on click
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function () {
+                this.classList.remove('unread');
+            });
+        });
+
+        // Mark all as read
+        document.querySelector('.mark-read')?.addEventListener('click', () => {
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.classList.remove('unread');
+            });
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+        });
+    });
+</script>

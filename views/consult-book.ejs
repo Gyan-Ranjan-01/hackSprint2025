@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking - DocOnCall</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --primary-soft: #DBEAFE;
+            --accent-teal: #0D9488;
+            --bg-body: #889fb7;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --header-bg: #F8FAFC;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .back-nav {
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+        }
+
+        /* Card Styles */
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid #E2E8F0;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #E2E8F0;
+            background: var(--header-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        /* Patient Details Table */
+        .details-table-wrapper {
+            padding: 24px;
+            overflow-x: auto;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .details-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 2px solid #E2E8F0;
+            width: 25%;
+        }
+
+        .details-table td {
+            padding: 12px;
+            color: var(--text-main);
+            font-weight: 500;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .symptom-tag {
+            display: inline-block;
+            background: #FEF3C7;
+            color: #D97706;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Verification Badge */
+        .verify-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .verify-badge.verified {
+            background: rgba(74, 222, 128, 0.2);
+            color: #16a34a;
+            border: 1px solid #4ade80;
+        }
+
+        .verify-badge.unverified {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid #f87171;
+        }
+
+        /* Doctor List Grid */
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 24px;
+            background: #F8FAFC;
+        }
+
+        .doctor-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary-blue);
+        }
+
+        .doc-header {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .doc-avatar {
+            width: 56px;
+            height: 56px;
+            background: var(--primary-soft);
+            color: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .doc-info h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .doc-specialty {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #F0FDFA;
+            color: var(--accent-teal);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(13, 148, 136, 0.2);
+        }
+
+        .doc-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: #F9FAFB;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-item strong {
+            display: block;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+
+        .book-btn:hover {
+            background: #1D4ED8;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .verified-green {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #1f2937;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Navigation -->
+        <div class="back-nav">
+            <a href="/consult" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Edit Details
+            </a>
+        </div>
+
+        <!-- Section 1: Review Patient Information -->
+        <section class="glass-panel">
+            <div class="section-header">
+                <h2>📋 Patient Details Review</h2>
+                <span style="font-size:12px; color:var(--text-muted)">Verify your information before booking</span>
+            </div>
+            <div class="details-table-wrapper">
+                <table class="details-table">
+                    <tbody>
+                        <tr>
+                            <th>Patient Name</th>
+                            <td>
+                                <%= patient.name %>
+                            </td>
+                            <th>Age / Gender</th>
+                            <td>
+                                <%= patient.age %> years / <%= patient.gender %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Contact</th>
+                            <td>
+                                <%= patient.contact %>
+                            </td>
+                            <th>Problem</th>
+                            <td>
+                                <%= patient.problem %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Preferred Date</th>
+                            <td>
+                                <%= patient.date %>
+                            </td>
+                            <th>Preferred Time</th>
+                            <td>
+                                <%= patient.time %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Blood Group / Chronic</th>
+                            <td>
+                                <%= patient.bloodGroup %> / <%= patient.chronicConditions %>
+                            </td>
+                            <th>Address</th>
+                            <td>
+                                <%= patient.address || 'N/A' %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Symptoms</th>
+                            <td colspan="3">
+                                <%= patient.symptoms %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 2: Recommended Doctors -->
+        <section class="glass-panel">
+            <div class="section-header">
+                <h2>🩺 Available Doctors</h2>
+                <% if(recommended && recommended.length> 0) { %>
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                        <%= recommended.length %> Specialists Found
+                    </span>
+                    <% } else { %>
+                        <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">
+                            Showing All Doctors
+                        </span>
+                        <% } %>
+            </div>
+
+            <div class="doctors-grid">
+                <% const docsToShow=(recommended && recommended.length> 0) ? recommended : doctors; %>
+
+                    <% if(docsToShow.length===0) { %>
+                        <div class="empty-state">
+                            <p>No doctors found at the moment.</p>
+                        </div>
+                        <% } %>
+
+                            <% docsToShow.forEach(doc=> { %>
+                                <div class="doctor-card">
+                                    <div class="doc-header">
+                                        <div class="doc-avatar">
+                                            <%= doc.name.charAt(0).toUpperCase() %>
+                                        </div>
+                                        <div class="doc-info">
+                                            <h4>Dr. <%= doc.name %>
+                                                    <% if(doc.isVerified) { %>
+                                                        <span class="verify-badge verified">✓ Verified</span>
+                                                        <% } else { %>
+                                                            <span class="verify-badge unverified">Not Verified</span>
+                                                            <% } %>
+                                            </h4>
+                                            <span class="doc-specialty">
+                                                <%= doc.specialization %>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="doc-details">
+                                        <div class="detail-item">
+                                            <strong>Experience</strong>
+                                            <%= doc.years_experience || '5+' %> Years
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>City</strong>
+                                            <%= doc.city || 'Online' %>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Education</strong>
+                                            <%= doc.degrees || 'MBBS' %>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Fee</strong>
+                                            ₹<%= doc.consultation_fee || '500' %>
+                                        </div>
+                                    </div>
+
+                                    <button class="book-btn" type="button" data-id="<%= doc._id %>"
+                                        data-name="<%= doc.name %>" onclick="handleBookClick(this)">
+                                        Book Appointment
+                                    </button>
+                                </div>
+                                <% }); %>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 1. SAFELY Embed Patient Data
+        // We add '|| {}' so the script doesn't crash if patient data is missing
+        const patientData = <%- JSON.stringify(patient || {}) %>;
+
+        console.log("Patient Data Loaded:", patientData); // Check console (F12) to see if this prints
+
+        // 2. The Intermediate Handler (Connects HTML to JS)
+        function handleBookClick(btnElement) {
+            console.log("Button Clicked!"); // Debug log
+            const id = btnElement.getAttribute('data-id');
+            const name = btnElement.getAttribute('data-name');
+            bookAppointment(id, name, btnElement);
+        }
+
+        // 3. The Main Logic
+        async function bookAppointment(doctorId, doctorName, btnElement) {
+            if (!patientData || !patientData.name) {
+                alert("Error: Patient data is missing. Please reload the page.");
+                console.error("Patient data is empty", patientData);
+                return;
+            }
+
+            let date = patientData.date;
+
+            // Fallback if date is missing
+            if (!date) {
+                date = prompt(`Select Date for appointment with Dr. ${doctorName} (YYYY-MM-DD):`, new Date().toISOString().split('T')[0]);
+                if (!date) return; // User cancelled
+            }
+
+            const payload = {
+                doctorId,
+                date,
+                time: patientData.time,
+                reason: patientData.problem,
+                gender: patientData.gender,
+                contact: patientData.contact,
+                symptoms: patientData.symptoms,
+                name: patientData.name,
+                bloodGroup: patientData.bloodGroup,
+                chronicConditions: patientData.chronicConditions,
+                address: patientData.address,
+            };
+
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Booking...";
+            btnElement.disabled = true;
+
+            try {
+                const res = await fetch('/api/consult/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    alert(`✅ Your booking has been confirmed with Dr. ${result.doctorName || doctorName}!`);
+                    window.location.href = '/';
+                } else {
+                    alert("❌ Booking Failed: " + (result.message || "Unknown error"));
+                    btnElement.innerText = originalText;
+                    btnElement.disabled = false;
+                }
+            } catch (e) {
+                console.error("Booking Error:", e);
+                alert("❌ Network Error. Check console for details.");
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

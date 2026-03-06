@@ -1,0 +1,212 @@
+<div id="signupModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;"> <!-- Wider for doctor form -->
+        <span class="close-modal" onclick="closeSignupModal()">&times;</span>
+
+        <div class="modal-body-container">
+            <!-- Toggle Switch -->
+            <div class="toggle-container">
+                <div class="toggle-btn" id="signupModalToggleBtn"></div>
+                <button class="toggle-option active" onclick="setSignupType('user')">Patient</button>
+                <button class="toggle-option" onclick="setSignupType('doctor')">Doctor</button>
+            </div>
+
+            <h2 id="signupFormTitle">Join as Patient</h2>
+            <p class="subtitle" id="signupFormSubtitle">Create an account to track your health</p>
+
+            <!-- USER SIGNUP FORM -->
+            <form method="post" id="userSignupForm" action="/signup">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 20px;">
+                    <input type="checkbox" id="userTerms" required style="width: auto; margin-right: 10px;">
+                    <label for="userTerms" style="display: inline;">I agree to the Terms & Conditions</label>
+                </div>
+                <button type="submit" class="modal-submit-btn user-btn">Sign Up as Patient</button>
+            </form>
+
+            <!-- DOCTOR SIGNUP FORM (Hidden by default) -->
+            <form method="post" id="doctorSignupForm" action="/doctor/signup" style="display: none;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" required placeholder="Dr. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" required placeholder="doctor@hospital.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Specialization</label>
+                    <select name="specialization" required
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="" disabled selected>Select Specialization</option>
+                        <option value="General Physician">General Physician</option>
+                        <option value="Cardiologist">Cardiologist</option>
+                        <option value="Dermatologist">Dermatologist</option>
+                        <option value="Pediatrician">Pediatrician</option>
+                        <option value="Neurologist">Neurologist</option>
+                        <option value="Orthopedic">Orthopedic</option>
+                        <option value="Psychiatrist">Psychiatrist</option>
+                        <option value="Gynecologist">Gynecologist</option>
+                        <option value="ENT Specialist">ENT Specialist</option>
+                    </select>
+                </div>
+
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Degrees</label>
+                        <input type="text" name="degrees" required placeholder="MBBS, MD">
+                    </div>
+                    <div class="form-group">
+                        <label>Experience (Yrs)</label>
+                        <input type="number" name="years_experience" required min="0" placeholder="5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Medical College</label>
+                    <input type="text" name="medical_college" required placeholder="AIIMS, New Delhi">
+                </div>
+
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" name="city" required placeholder="Mumbai">
+                    </div>
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <input type="text" name="phone" required placeholder="+91 9876543210">
+                    </div>
+                </div>
+
+                <!-- Hidden/Defaults for simplicity in modal, or add if critical -->
+                <input type="hidden" name="state" value="India">
+                <div class="form-group">
+                    <label>Available Time</label>
+                    <input type="text" name="available_time" required placeholder="Mon-Sat 10am-6pm">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <button type="submit" class="modal-submit-btn doctor-btn">Register as Doctor</button>
+            </form>
+
+            <div class="link-container" style="text-align: center; margin-top: 20px;">
+                Already have an account? <a href="#" style="color: #667eea; text-decoration: none; font-weight: 600;"
+                    onclick="switchModalToLogin()">Log in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openSignupModal() {
+        // Close login modal if open
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.style.display = 'none';
+
+        document.getElementById('signupModal').style.display = 'flex';
+        setSignupType('user'); // Reset to user by default
+    }
+
+    function closeSignupModal() {
+        document.getElementById('signupModal').style.display = 'none';
+    }
+
+    function switchModalToLogin() {
+        closeSignupModal();
+        if (typeof openLoginModal === 'function') {
+            openLoginModal();
+        }
+    }
+
+    // Close on click outside
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('signupModal')) {
+            closeSignupModal();
+        }
+    });
+
+    function setSignupType(type) {
+        const userForm = document.getElementById('userSignupForm');
+        const docForm = document.getElementById('doctorSignupForm');
+
+        const toggleBtn = document.getElementById('signupModalToggleBtn');
+        const options = document.querySelectorAll('#signupModal .toggle-option');
+
+        const title = document.getElementById('signupFormTitle');
+        const subtitle = document.getElementById('signupFormSubtitle');
+
+        if (type === 'user') {
+            userForm.style.display = 'block';
+            docForm.style.display = 'none';
+
+            toggleBtn.style.left = '0';
+            options[0].classList.add('active');
+            options[1].classList.remove('active');
+
+            title.textContent = 'Join as Patient';
+            title.style.color = '#333';
+            subtitle.textContent = 'Create an account to track your health';
+        } else {
+            userForm.style.display = 'none';
+            docForm.style.display = 'block';
+
+            toggleBtn.style.left = '50%';
+            options[0].classList.remove('active');
+            options[1].classList.add('active');
+
+            title.textContent = 'Join as Doctor';
+            title.style.color = '#2c3e50';
+            subtitle.textContent = 'Expand your practice and reach more patients';
+        }
+    }
+</script>
+
+<style>
+    /* Scoped styles for signup modal */
+    .modal-submit-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 16px;
+        transition: transform 0.2s;
+    }
+
+    .modal-submit-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .user-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .doctor-btn {
+        background: linear-gradient(135deg, #1abc9c 0%, #2980b9 100%);
+    }
+
+    /* Scrollable content for smaller screens if form is long */
+    #signupModal .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+</style>

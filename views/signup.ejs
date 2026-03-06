@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +39,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -214,34 +216,72 @@
         }
 
         @media (max-width: 768px) {
-        .container {
-          grid-template-columns: 1fr; /* Single column */
-          height: auto;
-          margin-top: 20px; /* Add breathing room */
-        }
+            .container {
+                grid-template-columns: 1fr;
+                /* Single column */
+                height: auto;
+                margin-top: 20px;
+                /* Add breathing room */
+            }
 
-        .left-panel {
-          display: none; /* Hide the decorative side entirely on mobile */
-        }
+            .left-panel {
+                display: none;
+                /* Hide the decorative side entirely on mobile */
+            }
 
-        .form-panel {
-          padding: 30px 20px; /* Reduce padding */
+            .form-panel {
+                padding: 70px 20px 30px 20px;
+                /* Increase top padding for back button */
+            }
+
+            /* Adjust font sizes */
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
-        
-        /* Adjust font sizes */
-        h2 { font-size: 1.5em; }
-        .form-options { flex-direction: column; align-items: flex-start; gap: 10px; }
-      }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="left-panel">
             <h1>Welcome!</h1>
-            <p>Join our community and unlock exclusive features. Sign up today to get started on your journey with us.</p>
+            <p>Join our community and unlock exclusive features. Sign up today to get started on your journey with us.
+            </p>
         </div>
-        
-        <div class="form-panel">
+
+        <div class="form-panel" style="position: relative;">
+            <a href="/" class="back-btn-top" title="Back to Home">←</a>
+            <style>
+                .back-btn-top {
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    text-decoration: none;
+                    color: #999;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    transition: all 0.3s;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    z-index: 100;
+                }
+
+                .back-btn-top:hover {
+                    background: #f5f5f5;
+                    color: #333;
+                }
+            </style>
             <h2>Create Account</h2>
             <p class="subtitle">Fill in your details to get started</p>
 
@@ -272,9 +312,16 @@
             <div class="login-link">
                 Already have an account? <a href="/login">Log in</a>
             </div>
+
+            <div class="divider"></div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <!-- Back button moved to top -->
+            </div>
         </div>
     </div>
 
 
 </body>
+
 </html>

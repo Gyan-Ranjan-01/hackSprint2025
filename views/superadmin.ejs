@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocOnCall - Super Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #5B7FFF;
+            --primary-purple: #7C5FFF;
+            --dark-bg: #0A0E1A;
+            --card-bg: #141824;
+            --card-hover: #1A1F2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A8C1;
+            --success-green: #4ADE80;
+            --error-red: #EF4444;
+            --warning-yellow: #FCD34D;
+            --border-color: #1F2937;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #1d1f24 0%, #1a1f35 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(20, 24, 36, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px 35px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px 25px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-box .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .section {
+            background: rgba(20, 24, 36, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .doctor-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        .doc-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .doc-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .doc-info h3 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .doc-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-badge.pending {
+            background: rgba(252, 211, 77, 0.2);
+            color: var(--warning-yellow);
+            border: 1px solid var(--warning-yellow);
+        }
+
+        .status-badge.verified {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .status-badge.unverified {
+            background: rgba(160, 168, 193, 0.2);
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .doc-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .doc-details span {
+            display: block;
+        }
+
+        .doc-details strong {
+            color: var(--text-primary);
+        }
+
+        .doc-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-view:hover {
+            background: rgba(91, 127, 255, 0.1);
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, var(--success-green), #22C55E);
+            color: white;
+        }
+
+        .btn-verify:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, var(--error-red), #DC2626);
+            color: white;
+        }
+
+        .btn-reject:hover {
+            transform: scale(1.02);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 26, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-field {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .form-field label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-field .value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🛡️ Super Admin Portal</h1>
+                <p>Doctor Verification Management</p>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="number" id="pendingCount">0</div>
+                    <div class="label">Pending</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number" id="verifiedCount">0</div>
+                    <div class="label">Verified</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number" id="totalCount">0</div>
+                    <div class="label">Total Doctors</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="section">
+            <h2 class="section-title">⏳ Pending Verification Requests</h2>
+            <div class="doctor-grid" id="pendingGrid"></div>
+        </div>
+
+        <!-- All Doctors -->
+        <div class="section">
+            <h2 class="section-title">👨‍⚕️ All Doctors</h2>
+            <div class="doctor-grid" id="allDoctorsGrid"></div>
+        </div>
+    </div>
+
+    <!-- Doctor Details Modal -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Doctor Details</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="doctorDetails"></div>
+        </div>
+    </div>
+
+    <script id="doctors-data" type="application/json"><%- JSON.stringify(doctors) %></script>
+
+    <script>
+        let doctors = [];
+        try {
+            doctors = JSON.parse(document.getElementById('doctors-data').textContent);
+        } catch (e) { console.error('Failed to load doctors', e); }
+
+        function updateStats() {
+            const pending = doctors.filter(d => d.verificationRequested && !d.isVerified).length;
+            const verified = doctors.filter(d => d.isVerified).length;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('verifiedCount').textContent = verified;
+            document.getElementById('totalCount').textContent = doctors.length;
+        }
+
+        function getStatusBadge(doc) {
+            if (doc.isVerified) return '<span class="status-badge verified">✓ Verified</span>';
+            if (doc.verificationRequested) return '<span class="status-badge pending">⏳ Pending</span>';
+            return '<span class="status-badge unverified">Not Verified</span>';
+        }
+
+        function renderDoctorCard(doc, showActions = true) {
+            const actions = doc.verificationRequested && !doc.isVerified ? `
+                <button class="btn btn-verify" onclick="verifyDoctor('${doc._id}')">✅ Verify</button>
+                <button class="btn btn-reject" onclick="rejectDoctor('${doc._id}')">❌ Reject</button>
+            ` : '';
+
+            return `
+                <div class="doctor-card" id="card-${doc._id}">
+                    <div class="doc-header">
+                        <div class="doc-avatar">${doc.name.charAt(0).toUpperCase()}</div>
+                        <div class="doc-info">
+                            <h3>Dr. ${doc.name} ${getStatusBadge(doc)}</h3>
+                            <p>${doc.specialization || 'General'}</p>
+                        </div>
+                    </div>
+                    <div class="doc-details">
+                        <span><strong>Degrees:</strong> ${doc.degrees || '--'}</span>
+                        <span><strong>Experience:</strong> ${doc.years_experience || '--'} years</span>
+                        <span><strong>City:</strong> ${doc.city || '--'}</span>
+                        <span><strong>Phone:</strong> ${doc.phone || '--'}</span>
+                    </div>
+                    <div class="doc-actions">
+                        <button class="btn btn-view" onclick="viewDoctor('${doc._id}')">👁️ View</button>
+                        ${showActions ? actions : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGrids() {
+            const pendingDocs = doctors.filter(d => d.verificationRequested && !d.isVerified);
+            const pendingGrid = document.getElementById('pendingGrid');
+
+            if (pendingDocs.length === 0) {
+                pendingGrid.innerHTML = '<div class="empty-state">No pending verification requests.</div>';
+            } else {
+                pendingGrid.innerHTML = pendingDocs.map(d => renderDoctorCard(d, true)).join('');
+            }
+
+            document.getElementById('allDoctorsGrid').innerHTML = doctors.map(d => renderDoctorCard(d, false)).join('');
+            updateStats();
+        }
+
+        function viewDoctor(id) {
+            const doc = doctors.find(d => d._id === id);
+            if (!doc) return;
+
+            document.getElementById('doctorDetails').innerHTML = `
+                <div class="form-row">
+                    <div class="form-field"><label>Name</label><div class="value">Dr. ${doc.name}</div></div>
+                    <div class="form-field"><label>Email</label><div class="value">${doc.email}</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Specialization</label><div class="value">${doc.specialization || '--'}</div></div>
+                    <div class="form-field"><label>Degrees</label><div class="value">${doc.degrees || '--'}</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Experience</label><div class="value">${doc.years_experience || '--'} years</div></div>
+                    <div class="form-field"><label>Medical College</label><div class="value">${doc.medical_college || '--'}</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>Phone</label><div class="value">${doc.phone || '--'}</div></div>
+                    <div class="form-field"><label>Location</label><div class="value">${doc.city || ''} ${doc.state || ''}</div></div>
+                </div>
+                <div class="form-field"><label>Available Time</label><div class="value">${doc.available_time || '--'}</div></div>
+            `;
+            document.getElementById('doctorModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('doctorModal').classList.remove('active');
+        }
+
+        async function verifyDoctor(id) {
+            if (!confirm('Verify this doctor?')) return;
+            try {
+                const res = await fetch(`/api/superadmin/verify/${id}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    const doc = doctors.find(d => d._id === id);
+                    if (doc) { doc.isVerified = true; doc.verificationRequested = false; }
+                    renderGrids();
+                    alert('✅ Doctor verified successfully!');
+                }
+            } catch (e) { alert('Error verifying doctor'); }
+        }
+
+        async function rejectDoctor(id) {
+            if (!confirm('Reject this verification request?')) return;
+            try {
+                const res = await fetch(`/api/superadmin/reject/${id}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    const doc = doctors.find(d => d._id === id);
+                    if (doc) { doc.verificationRequested = false; }
+                    renderGrids();
+                    alert('❌ Verification rejected.');
+                }
+            } catch (e) { alert('Error rejecting'); }
+        }
+
+        window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); }
+
+        renderGrids();
+    </script>
+</body>
+
+</html>
