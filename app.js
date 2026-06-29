@@ -13,8 +13,8 @@ const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Groq = require('groq-sdk');
 
-// const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/hacksprint";
-const dbUrl = "mongodb://127.0.0.1:27017/hacksprint";
+const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/hacksprint";
+// const dbUrl = "mongodb://127.0.0.1:27017/hacksprint";
 
 // ==================== MODEL CONFIGURATION ====================
 // Define model fallback order with Groq integration
@@ -494,7 +494,7 @@ app.get("/logout", (req, res) => {
 
     req.session.destroy((err) => {
         if (err) {
-            console.log(`❌ Logout error for ${userEmail}:`, err.message);
+            console.log(`❌ Logout error for ${userEmail}:`, err);
             return res.redirect("/");
         }
         
@@ -1294,7 +1294,7 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-    console.error('❌ Server Error:', err.message);
+    console.error('❌ Server Error:', err);
 
     const statusCode = err.statusCode || 500;
     const message = err.isOperational ? err.message : 'Something went wrong on the server.';
