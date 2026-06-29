@@ -191,7 +191,7 @@ async function generateWithFallback(genAI, groqClient, prompt, customConfig = {}
                 stats.lastFailure = Date.now();
                 console.log(`⚠️ Rate limit hit on ${modelConfig.name}. Trying next model...`);
             } else {
-                console.log(`❌ Error with ${modelConfig.name}: ${error.message}`);
+                console.log(`❌ Error with ${modelConfig.name}: ${error}`);
             }
             
             // Continue to next model
