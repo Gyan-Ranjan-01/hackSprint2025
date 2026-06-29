@@ -22,57 +22,30 @@ const MODEL_PRIORITY = [
     {
         name: "gemini-2.5-flash",
         provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
+        config: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8000
+        }
     },
     {
-        name: "gemini-2.5-flash-lite", 
+        name: "gemini-2.5-flash-lite",
         provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
+        config: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8000
+        }
     },
     {
         name: "llama-3.3-70b-versatile",
         provider: "groq",
-        config: { temperature: 0.7, max_tokens: 8000 }
-    },
-    {
-        name: "gemini-2.5-flash-tts",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 800 }
-    },
-    {
-        name: "gemini-3-flash",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemma-3-12b",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemma-3-1b",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemma-3-27b",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemma-3-2b",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemma-3-4b",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
-    },
-    {
-        name: "gemini-robotics-er-1.5-preview",
-        provider: "gemini",
-        config: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 8000 }
+        config: {
+            temperature: 0.7,
+            max_tokens: 8000
+        }
     }
 ];
 
